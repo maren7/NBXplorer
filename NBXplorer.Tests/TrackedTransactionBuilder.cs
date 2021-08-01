@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin;
-using NBXplorer.Models;
+using NRealbit;
+using NRXplorer.Models;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public class TrackedTransactionBuilder
 	{
@@ -40,7 +40,7 @@ namespace NBXplorer.Tests
 
 			public TransactionContext(TrackedTransactionBuilder parent)
 			{
-				_TransactionId = NBitcoin.RandomUtils.GetUInt256();
+				_TransactionId = NRealbit.RandomUtils.GetUInt256();
 				_Parent = parent;
 			}
 
@@ -69,7 +69,7 @@ namespace NBXplorer.Tests
 
 			public TransactionContext Timestamp(long time)
 			{
-				_TimeStamp = NBitcoin.Utils.UnixTimeToDateTime(time);
+				_TimeStamp = NRealbit.Utils.UnixTimeToDateTime(time);
 				return this;
 			}
 

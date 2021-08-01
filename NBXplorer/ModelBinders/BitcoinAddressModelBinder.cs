@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NBitcoin;
+using NRealbit;
 using System.Reflection;
 using System;
 using System.Threading.Tasks;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 
-namespace NBXplorer.ModelBinders
+namespace NRXplorer.ModelBinders
 {
-	public class BitcoinAddressModelBinder : IModelBinder
+	public class RealbitAddressModelBinder : IModelBinder
 	{
-		public BitcoinAddressModelBinder()
+		public RealbitAddressModelBinder()
 		{
 
 		}
@@ -18,7 +18,7 @@ namespace NBXplorer.ModelBinders
 
 		public Task BindModelAsync(ModelBindingContext bindingContext)
 		{
-			if (!typeof(BitcoinAddress).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType))
+			if (!typeof(RealbitAddress).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType))
 			{
 				return Task.CompletedTask;
 			}
@@ -36,12 +36,12 @@ namespace NBXplorer.ModelBinders
 				return Task.CompletedTask;
 			}
 
-			var networkProvider = (NBXplorer.NBXplorerNetworkProvider)bindingContext.HttpContext.RequestServices.GetService(typeof(NBXplorer.NBXplorerNetworkProvider));
+			var networkProvider = (NRXplorer.NRXplorerNetworkProvider)bindingContext.HttpContext.RequestServices.GetService(typeof(NRXplorer.NRXplorerNetworkProvider));
 			var cryptoCode = bindingContext.ValueProvider.GetValue("cryptoCode").FirstValue;
-			var network = networkProvider.GetFromCryptoCode(cryptoCode ?? "BTC");
+			var network = networkProvider.GetFromCryptoCode(cryptoCode ?? "BRLB");
 			try
 			{
-				var data = BitcoinAddress.Create(key, network.NBitcoinNetwork);
+				var data = RealbitAddress.Create(key, network.NRealbitNetwork);
 				if (!bindingContext.ModelType.IsInstanceOfType(data))
 				{
 					throw new FormatException("Invalid address");

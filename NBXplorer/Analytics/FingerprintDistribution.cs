@@ -1,12 +1,12 @@
-﻿using NBitcoin;
-using NBitcoin.Crypto;
+﻿using NRealbit;
+using NRealbit.Crypto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Analytics
+namespace NRXplorer.Analytics
 {
 	public class FingerprintDistribution
 	{

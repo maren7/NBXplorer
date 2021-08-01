@@ -1,9 +1,9 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class AssetMoney : IComparable, IComparable<AssetMoney>, IEquatable<AssetMoney>, IMoney
 	{

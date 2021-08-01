@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace NBXplorer.Logging
+namespace NRXplorer.Logging
 {
 	// Credits to https://exceptionnotfound.net/using-middleware-to-log-requests-and-responses-in-asp-net-core/
 	public class LogAllRequestsMiddleware

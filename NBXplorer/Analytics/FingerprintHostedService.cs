@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Hosting;
-using NBitcoin;
-using NBXplorer.Models;
+using NRealbit;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Analytics
+namespace NRXplorer.Analytics
 {
 	/// <summary>
 	/// This listen new blocks, and computer the 5 block windows of fingerprint distribution
@@ -17,18 +17,18 @@ namespace NBXplorer.Analytics
 		const int BlockWindow = 5;
 		class NetworkFingerprintData
 		{
-			internal BitcoinDWaiter waiter;
+			internal RealbitDWaiter waiter;
 			internal FingerprintDistribution Distribution;
 			internal FingerprintDistribution DefaultDistribution;
 			internal Queue<FingerprintDistribution> BlockDistributions = new Queue<FingerprintDistribution>();
 		}
 
 		private readonly EventAggregator eventAggregator;
-		private readonly BitcoinDWaiters waiters;
-		private readonly Dictionary<NBXplorerNetwork, NetworkFingerprintData> data = new Dictionary<NBXplorerNetwork, NetworkFingerprintData>();
+		private readonly RealbitDWaiters waiters;
+		private readonly Dictionary<NRXplorerNetwork, NetworkFingerprintData> data = new Dictionary<NRXplorerNetwork, NetworkFingerprintData>();
 		IDisposable subscription;
 		public FingerprintHostedService(EventAggregator eventAggregator,
-										BitcoinDWaiters waiters)
+										RealbitDWaiters waiters)
 		{
 			this.eventAggregator = eventAggregator;
 			this.waiters = waiters;
@@ -40,7 +40,7 @@ namespace NBXplorer.Analytics
 				data.Add(network, new NetworkFingerprintData()
 				{
 					waiter = waiters.GetWaiter(network),
-					DefaultDistribution = network.CryptoCode == "BTC" ? _DefaultBTC : null
+					DefaultDistribution = network.CryptoCode == "BRLB" ? _DefaultBRLB : null
 				});
 			}
 			subscription = this.eventAggregator.Subscribe<RawBlockEvent>(evt =>
@@ -48,7 +48,7 @@ namespace NBXplorer.Analytics
 				var d = data[evt.Network];
 				// If we catchup lot's of old block we do not care about their
 				// distribution.
-				if (d.waiter.State != BitcoinDWaiterState.Ready)
+				if (d.waiter.State != RealbitDWaiterState.Ready)
 					return;
 				var blockDistribution = FingerprintDistribution.Calculate(evt.Block);
 				lock (d)
@@ -64,7 +64,7 @@ namespace NBXplorer.Analytics
 			return Task.CompletedTask;
 		}
 
-		public FingerprintDistribution GetDistribution(NBXplorerNetwork network)
+		public FingerprintDistribution GetDistribution(NRXplorerNetwork network)
 		{
 			return data[network].Distribution ?? data[network].DefaultDistribution;
 		}
@@ -76,7 +76,7 @@ namespace NBXplorer.Analytics
 		}
 
 		// Generated via test GenerateDefaultDistribution
-		static FingerprintDistribution _DefaultBTC = new FingerprintDistribution(new Dictionary<Fingerprint, int>()
+		static FingerprintDistribution _DefaultBRLB = new FingerprintDistribution(new Dictionary<Fingerprint, int>()
 		{
 			{ Fingerprint.V1 | Fingerprint.SpendFromP2PKH | Fingerprint.TimelockZero | Fingerprint.SequenceAllFinal, 602 },
 			{ Fingerprint.V1 | Fingerprint.SpendFromP2PKH | Fingerprint.LowR | Fingerprint.TimelockZero | Fingerprint.SequenceAllFinal, 432 },

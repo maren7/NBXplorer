@@ -1,11 +1,11 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	internal class UTXOByOutpoint : IEnumerable<KeyValuePair<OutPoint, ICoin>>
 	{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Configuration
+namespace NRXplorer.Configuration
 {
 	public class ConfigException : Exception
 	{

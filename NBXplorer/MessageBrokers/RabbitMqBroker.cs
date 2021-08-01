@@ -4,14 +4,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Unicode;
 using System.Threading.Tasks;
-using NBXplorer.Models;
+using NRXplorer.Models;
 using RabbitMQ.Client;
 
-namespace NBXplorer.MessageBrokers
+namespace NRXplorer.MessageBrokers
 {
     internal class RabbitMqBroker : IBrokerClient
     {
-        private readonly NBXplorerNetworkProvider Networks;
+        private readonly NRXplorerNetworkProvider Networks;
         private readonly ConnectionFactory ConnectionFactory;
         private readonly string NewTransactionExchange;
         private readonly string NewBlockExchange;
@@ -20,7 +20,7 @@ namespace NBXplorer.MessageBrokers
         private IModel Channel;
 
         public RabbitMqBroker(
-            NBXplorerNetworkProvider networks, ConnectionFactory connectionFactory, 
+            NRXplorerNetworkProvider networks, ConnectionFactory connectionFactory, 
             string newTransactionExchange, string newBlockExchange)
         {
             Networks = networks;

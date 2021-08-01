@@ -1,30 +1,30 @@
-﻿using NBXplorer.Configuration;
+﻿using NRXplorer.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Events
+namespace NRXplorer.Events
 {
-    public class BitcoinDStateChangedEvent
+    public class RealbitDStateChangedEvent
 	{
-		public BitcoinDStateChangedEvent(NBXplorerNetwork network, BitcoinDWaiterState oldState, BitcoinDWaiterState newState)
+		public RealbitDStateChangedEvent(NRXplorerNetwork network, RealbitDWaiterState oldState, RealbitDWaiterState newState)
 		{
 			OldState = oldState;
 			NewState = newState;
 			Network = network;
 		}
 
-		public NBXplorerNetwork Network
+		public NRXplorerNetwork Network
 		{
 			get; set;
 		}
 
-		public BitcoinDWaiterState OldState
+		public RealbitDWaiterState OldState
 		{
 			get; set;
 		}
-		public BitcoinDWaiterState NewState
+		public RealbitDWaiterState NewState
 		{
 			get; set;
 		}

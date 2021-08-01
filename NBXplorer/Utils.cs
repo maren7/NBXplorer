@@ -1,11 +1,11 @@
-﻿using NBitcoin;
-using NBXplorer.Models;
+﻿using NRealbit;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public static class Utils
 	{
@@ -111,7 +111,7 @@ namespace NBXplorer
 
 		public static TransactionResult ToTransactionResult(SlimChain chain, Repository.SavedTransaction[] result)
 		{
-			var noDate = NBitcoin.Utils.UnixTimeToDateTime(0);
+			var noDate = NRealbit.Utils.UnixTimeToDateTime(0);
 			var oldest = result
 						.Where(o => o.Timestamp != noDate)
 						.OrderBy(o => o.Timestamp).FirstOrDefault() ?? result.First();

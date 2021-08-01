@@ -1,9 +1,9 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
-using NBitcoin.DataEncoders;
-using NBitcoin.JsonConverters;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+using NRealbit.DataEncoders;
+using NRealbit.JsonConverters;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,10 +14,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
-using NBitcoin.RPC;
+using NRealbit.RPC;
 using Newtonsoft.Json.Linq;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class ExplorerClient
 	{
@@ -78,11 +78,11 @@ namespace NBXplorer
 			}
 		}
 
-		public ExplorerClient(NBXplorerNetwork network, Uri serverAddress = null) : this(network, serverAddress, null)
+		public ExplorerClient(NRXplorerNetwork network, Uri serverAddress = null) : this(network, serverAddress, null)
 		{
 
 		}
-		public ExplorerClient(NBXplorerNetwork network, Uri serverAddress, IAuth customAuth)
+		public ExplorerClient(NRXplorerNetwork network, Uri serverAddress, IAuth customAuth)
 		{
 			serverAddress = serverAddress ?? network.DefaultSettings.DefaultUrl;
 			if (network == null)
@@ -128,10 +128,10 @@ namespace NBXplorer
 				{
 					CookieFile = cookieAuthentication.CookieFilePath
 				}
-				: new RPCCredentialString(), GetFullUri($"v1/cryptos/{_CryptoCode}/rpc"), _Network.NBitcoinNetwork);
+				: new RPCCredentialString(), GetFullUri($"v1/cryptos/{_CryptoCode}/rpc"), _Network.NRealbitNetwork);
 		}
 
-		private readonly string _CryptoCode = "BTC";
+		private readonly string _CryptoCode = "BRLB";
 		public string CryptoCode
 		{
 			get
@@ -323,11 +323,11 @@ namespace NBXplorer
 		}
 
 
-		public GetBalanceResponse GetBalance(BitcoinAddress address, CancellationToken cancellation = default)
+		public GetBalanceResponse GetBalance(RealbitAddress address, CancellationToken cancellation = default)
 		{
 			return GetBalanceAsync(address, cancellation).GetAwaiter().GetResult();
 		}
-		public Task<GetBalanceResponse> GetBalanceAsync(BitcoinAddress address, CancellationToken cancellation = default)
+		public Task<GetBalanceResponse> GetBalanceAsync(RealbitAddress address, CancellationToken cancellation = default)
 		{
 			return SendAsync<GetBalanceResponse>(HttpMethod.Get, null, "v1/cryptos/{0}/addresses/{1}/balance", new[] { CryptoCode, address.ToString() }, cancellation);
 		}
@@ -432,7 +432,7 @@ namespace NBXplorer
 			{
 				return await GetAsync<KeyPathInformation>($"v1/cryptos/{CryptoCode}/derivations/{strategy}/addresses/unused?feature={feature}&skip={skip}&reserve={reserve}", null, cancellation).ConfigureAwait(false);
 			}
-			catch (NBXplorerException ex) when (ex.Error?.HttpCode == 404)
+			catch (NRXplorerException ex) when (ex.Error?.HttpCode == 404)
 			{
 				return null;
 			}
@@ -475,7 +475,7 @@ namespace NBXplorer
 			{
 				return await GetAsync<GetFeeRateResult>("v1/cryptos/{0}/fees/{1}", new object[] { CryptoCode, blockCount }, cancellation).ConfigureAwait(false);
 			}
-			catch (NBXplorerException ex) when (fallbackFeeRate != null && ex.Error.Code == "fee-estimation-unavailable")
+			catch (NRXplorerException ex) when (fallbackFeeRate != null && ex.Error.Code == "fee-estimation-unavailable")
 			{
 				return new GetFeeRateResult() { BlockCount = blockCount, FeeRate = fallbackFeeRate };
 			}
@@ -569,8 +569,8 @@ namespace NBXplorer
 			Client = client;
 		}
 
-		private readonly NBXplorerNetwork _Network;
-		public NBXplorerNetwork Network
+		private readonly NRXplorerNetwork _Network;
+		public NRXplorerNetwork Network
 		{
 			get
 			{
@@ -681,7 +681,7 @@ namespace NBXplorer
 					}
 				if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
 					response.EnsureSuccessStatusCode();
-				var error = Serializer.ToObject<NBXplorerError>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+				var error = Serializer.ToObject<NRXplorerError>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 				if (error == null)
 					response.EnsureSuccessStatusCode();
 				throw error.AsException();
@@ -696,7 +696,7 @@ namespace NBXplorer
 					return;
 				if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
 					response.EnsureSuccessStatusCode();
-				var error = Serializer.ToObject<NBXplorerError>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+				var error = Serializer.ToObject<NRXplorerError>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 				if (error == null)
 					response.EnsureSuccessStatusCode();
 				throw error.AsException();

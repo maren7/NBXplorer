@@ -1,15 +1,15 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
-using NBitcoin.Protocol;
+using NRealbit.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin.Crypto;
+using NRealbit.Crypto;
 using System.IO;
 using Newtonsoft.Json;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class UTXOChanges
 	{

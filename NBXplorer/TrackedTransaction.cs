@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NBitcoin;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
-using static NBXplorer.Repository;
+using NRealbit;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
+using static NRXplorer.Repository;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public partial class TrackedTransaction
 	{
@@ -131,7 +131,7 @@ namespace NBXplorer
 							});
 		}
 
-		public virtual ITrackedTransactionSerializable CreateBitcoinSerializable()
+		public virtual ITrackedTransactionSerializable CreateRealbitSerializable()
 		{
 			return new TransactionMatchData(this);
 		}

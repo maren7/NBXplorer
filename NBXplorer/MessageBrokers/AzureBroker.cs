@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
-using NBXplorer.Models;
+using NRXplorer.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,13 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
-namespace NBXplorer.MessageBrokers
+namespace NRXplorer.MessageBrokers
 {
 	public class AzureBroker : IBrokerClient
 	{
 		const int MaxMessageIdLength = 128;
 
-		public AzureBroker(ISenderClient client, NBXplorerNetworkProvider networks)
+		public AzureBroker(ISenderClient client, NRXplorerNetworkProvider networks)
 		{
 			Client = client;
 			Networks = networks;
@@ -25,7 +25,7 @@ namespace NBXplorer.MessageBrokers
 		{
 			get;
 		}
-		public NBXplorerNetworkProvider Networks { get; }
+		public NRXplorerNetworkProvider Networks { get; }
 
 		static Encoding UTF8 = new UTF8Encoding(false);
 		public async Task Send(NewTransactionEvent transactionEvent)

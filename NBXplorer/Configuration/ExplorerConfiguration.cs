@@ -3,17 +3,17 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin;
+using NRealbit;
 using System.IO;
 using System.Net;
-using NBXplorer.Logging;
-using NBitcoin.Protocol;
-using NBitcoin.DataEncoders;
-using NBitcoin.RPC;
+using NRXplorer.Logging;
+using NRealbit.Protocol;
+using NRealbit.DataEncoders;
+using NRealbit.RPC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Ini;
 
-namespace NBXplorer.Configuration
+namespace NRXplorer.Configuration
 {
 	public class ChainConfiguration
 	{
@@ -68,7 +68,7 @@ namespace NBXplorer.Configuration
 			get; set;
 		}
 		public string SignalFilesDir { get; set; }
-		public NBXplorerNetworkProvider NetworkProvider
+		public NRXplorerNetworkProvider NetworkProvider
 		{
 			get; set;
 		}
@@ -94,8 +94,8 @@ namespace NBXplorer.Configuration
 
 		public ExplorerConfiguration LoadArgs(IConfiguration config)
 		{
-			NetworkProvider = new NBXplorerNetworkProvider(DefaultConfiguration.GetNetworkType(config));
-			var defaultSettings = NBXplorerDefaultSettings.GetDefaultSettings(NetworkProvider.NetworkType);
+			NetworkProvider = new NRXplorerNetworkProvider(DefaultConfiguration.GetNetworkType(config));
+			var defaultSettings = NRXplorerDefaultSettings.GetDefaultSettings(NetworkProvider.NetworkType);
 			BaseDataDir = config.GetOrDefault<string>("datadir", null);
 			if(BaseDataDir == null)
 			{
@@ -107,7 +107,7 @@ namespace NBXplorer.Configuration
 			}
 
 			Logs.Configuration.LogInformation("Network: " + NetworkProvider.NetworkType.ToString());
-			var supportedChains = config.GetOrDefault<string>("chains", "btc")
+			var supportedChains = config.GetOrDefault<string>("chains", "brlb")
 									  .Split(',', StringSplitOptions.RemoveEmptyEntries)
 									  .Select(t => t.ToUpperInvariant());
 			var validChains = new List<string>();
@@ -121,29 +121,29 @@ namespace NBXplorer.Configuration
 					chainConfiguration.Rescan = config.GetOrDefault<bool>($"{network.CryptoCode}.rescan", false);
 					chainConfiguration.CryptoCode = network.CryptoCode;
 
-					var args = RPCArgs.Parse(config, network.NBitcoinNetwork, network.CryptoCode);
+					var args = RPCArgs.Parse(config, network.NRealbitNetwork, network.CryptoCode);
 
 					chainConfiguration.RPC = args.ConfigureRPCClient(network);
-					if (chainConfiguration.RPC.Address.Port == network.NBitcoinNetwork.DefaultPort)
+					if (chainConfiguration.RPC.Address.Port == network.NRealbitNetwork.DefaultPort)
 					{
-						Logs.Configuration.LogWarning($"{network.CryptoCode}: It seems that the RPC port ({chainConfiguration.RPC.Address.Port}) is equal to the default P2P port ({network.NBitcoinNetwork.DefaultPort}), this is probably a misconfiguration.");
+						Logs.Configuration.LogWarning($"{network.CryptoCode}: It seems that the RPC port ({chainConfiguration.RPC.Address.Port}) is equal to the default P2P port ({network.NRealbitNetwork.DefaultPort}), this is probably a misconfiguration.");
 					}
 					if((chainConfiguration.RPC.CredentialString.CookieFile != null || chainConfiguration.RPC.CredentialString.UseDefault) && !network.SupportCookieAuthentication)
 					{
 						throw new ConfigException($"Chain {network.CryptoCode} does not support cookie file authentication,\n" +
-							$"Please use {network.CryptoCode.ToLowerInvariant()}rpcuser and {network.CryptoCode.ToLowerInvariant()}rpcpassword settings in NBXplorer" +
+							$"Please use {network.CryptoCode.ToLowerInvariant()}rpcuser and {network.CryptoCode.ToLowerInvariant()}rpcpassword settings in NRXplorer" +
 							$"And configure rpcuser and rpcpassword in the configuration file or in commandline or your node");
 					}
-					chainConfiguration.NodeEndpoint = NBitcoin.Utils.ParseEndpoint(config.GetOrDefault<string>($"{network.CryptoCode}.node.endpoint", "127.0.0.1"), network.NBitcoinNetwork.DefaultPort);
+					chainConfiguration.NodeEndpoint = NRealbit.Utils.ParseEndpoint(config.GetOrDefault<string>($"{network.CryptoCode}.node.endpoint", "127.0.0.1"), network.NRealbitNetwork.DefaultPort);
 
-					if (GetPort(chainConfiguration.NodeEndpoint) == network.NBitcoinNetwork.RPCPort)
+					if (GetPort(chainConfiguration.NodeEndpoint) == network.NRealbitNetwork.RPCPort)
 					{
-						Logs.Configuration.LogWarning($"{network.CryptoCode}: It seems that the node endpoint port ({GetPort(chainConfiguration.NodeEndpoint)}) is equal to the default RPC port ({network.NBitcoinNetwork.RPCPort}), this is probably a misconfiguration.");
+						Logs.Configuration.LogWarning($"{network.CryptoCode}: It seems that the node endpoint port ({GetPort(chainConfiguration.NodeEndpoint)}) is equal to the default RPC port ({network.NRealbitNetwork.RPCPort}), this is probably a misconfiguration.");
 					}
 
 					chainConfiguration.StartHeight = config.GetOrDefault<int>($"{network.CryptoCode}.startheight", -1);
 
-					if (!(network is NBXplorer.NBXplorerNetworkProvider.LiquidNBXplorerNetwork))
+					if (!(network is NRXplorer.NRXplorerNetworkProvider.LiquidNRXplorerNetwork))
 					{
 						if (config.GetOrDefault<int>($"{network.CryptoCode}.minutxovalue", -1) is int v && v != -1)
 						{
@@ -170,7 +170,7 @@ namespace NBXplorer.Configuration
 				throw new ConfigException("mingapsize should be equal or lower than maxgapsize");
 			if(!Directory.Exists(BaseDataDir))
 				Directory.CreateDirectory(BaseDataDir);
-			DataDir = Path.Combine(BaseDataDir, NBXplorerDefaultSettings.GetFolderName(NetworkProvider.NetworkType));
+			DataDir = Path.Combine(BaseDataDir, NRXplorerDefaultSettings.GetFolderName(NetworkProvider.NetworkType));
 			if (!Directory.Exists(DataDir))
 				Directory.CreateDirectory(DataDir);
 			SignalFilesDir = config.GetOrDefault<string>("signalfilesdir", null);
@@ -217,7 +217,7 @@ namespace NBXplorer.Configuration
 			throw new NotSupportedException();
 		}
 
-		public bool Supports(NBXplorerNetwork network)
+		public bool Supports(NRXplorerNetwork network)
 		{
 			return ChainConfigurations.Any(c => network.CryptoCode == c.CryptoCode);
 		}

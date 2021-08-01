@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NBXplorer.Models;
+using NRXplorer.Models;
 
-namespace NBXplorer.MessageBrokers
+namespace NRXplorer.MessageBrokers
 {
     public class CompositeBroker : IBrokerClient
     {

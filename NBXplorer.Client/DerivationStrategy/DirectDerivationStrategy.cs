@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-using NBitcoin;
-using NBitcoin.Crypto;
+using NRealbit;
+using NRealbit.Crypto;
 
-namespace NBXplorer.DerivationStrategy
+namespace NRXplorer.DerivationStrategy
 {
 	public class DirectDerivationStrategy : DerivationStrategyBase
 	{
-		BitcoinExtPubKey _Root;
+		RealbitExtPubKey _Root;
 
 		public ExtPubKey Root
 		{
@@ -38,7 +38,7 @@ namespace NBXplorer.DerivationStrategy
 			}
 		}
 
-		public DirectDerivationStrategy(BitcoinExtPubKey root, bool segwit, ReadOnlyDictionary<string, bool> additionalOptions = null) : base(additionalOptions)
+		public DirectDerivationStrategy(RealbitExtPubKey root, bool segwit, ReadOnlyDictionary<string, bool> additionalOptions = null) : base(additionalOptions)
 		{
 			if(root == null)
 				throw new ArgumentNullException(nameof(root));

@@ -1,16 +1,16 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class CreatePSBTResponse
 	{
 		[JsonProperty("psbt")]
 		public PSBT PSBT { get; set; }
-		public BitcoinAddress ChangeAddress { get; set; }
+		public RealbitAddress ChangeAddress { get; set; }
 		public CreatePSBTSuggestions Suggestions { get; set; }
 
 	}

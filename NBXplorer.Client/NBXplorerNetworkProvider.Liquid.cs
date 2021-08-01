@@ -1,18 +1,18 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NBitcoin.Altcoins.Elements;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+using NRealbit.Altcoins.Elements;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-	public partial class NBXplorerNetworkProvider
+	public partial class NRXplorerNetworkProvider
 	{
-		public class LiquidNBXplorerNetwork : NBXplorerNetwork
+		public class LiquidNRXplorerNetwork : NRXplorerNetwork
 		{
-			internal LiquidNBXplorerNetwork(INetworkSet networkSet, ChainName networkType) : base(networkSet, networkType)
+			internal LiquidNRXplorerNetwork(INetworkSet networkSet, ChainName networkType) : base(networkSet, networkType)
 			{
 			}
 
@@ -23,14 +23,14 @@ namespace NBXplorer
 				return factory;
 			}
 
-			public override BitcoinAddress CreateAddress(DerivationStrategyBase derivationStrategy, KeyPath keyPath, Script scriptPubKey)
+			public override RealbitAddress CreateAddress(DerivationStrategyBase derivationStrategy, KeyPath keyPath, Script scriptPubKey)
 			{
 				if (derivationStrategy.Unblinded())
 				{
 					return base.CreateAddress(derivationStrategy, keyPath, scriptPubKey);
 				}
 				var blindingPubKey = GenerateBlindingKey(derivationStrategy, keyPath).PubKey;
-				return new BitcoinBlindedAddress(blindingPubKey, base.CreateAddress(derivationStrategy, keyPath, scriptPubKey));
+				return new RealbitBlindedAddress(blindingPubKey, base.CreateAddress(derivationStrategy, keyPath, scriptPubKey));
 			}
 
 			public static Key GenerateBlindingKey(DerivationStrategyBase derivationStrategy, KeyPath keyPath)
@@ -46,16 +46,16 @@ namespace NBXplorer
 		}
 		private void InitLiquid(ChainName networkType)
 		{
-			Add(new LiquidNBXplorerNetwork(NBitcoin.Altcoins.Liquid.Instance, networkType)
+			Add(new LiquidNRXplorerNetwork(NRealbit.Altcoins.Liquid.Instance, networkType)
 			{
 				MinRPCVersion = 150000,
 				CoinType = networkType == ChainName.Mainnet ? new KeyPath("1776'") : new KeyPath("1'"),
 			});
 		}
 
-		public NBXplorerNetwork GetLBTC()
+		public NRXplorerNetwork GetLBRLB()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Liquid.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Liquid.Instance.CryptoCode);
 		}
 	}
 	

@@ -3,35 +3,35 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NBitcoin;
-using NBXplorer.Configuration;
+using NRealbit;
+using NRXplorer.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc;
-using NBXplorer.Filters;
+using NRXplorer.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
-using NBXplorer.DerivationStrategy;
-using NBitcoin.Crypto;
-using NBXplorer.Models;
+using NRXplorer.DerivationStrategy;
+using NRealbit.Crypto;
+using NRXplorer.Models;
 using System.IO;
-using NBXplorer.Logging;
+using NRXplorer.Logging;
 using System.Net;
-using NBitcoin.RPC;
+using NRealbit.RPC;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.AspNetCore.Authentication;
-using NBXplorer.Authentication;
-using NBitcoin.DataEncoders;
+using NRXplorer.Authentication;
+using NRealbit.DataEncoders;
 using System.Text.RegularExpressions;
-using NBXplorer.MessageBrokers;
-using NBitcoin.Protocol;
+using NRXplorer.MessageBrokers;
+using NRealbit.Protocol;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public static class Extensions
 	{
@@ -74,7 +74,7 @@ namespace NBXplorer
 				return null;
 			if(response.Result["time"] != null)
 			{
-				return NBitcoin.Utils.UnixTimeToDateTime((uint)response.Result["time"]);
+				return NRealbit.Utils.UnixTimeToDateTime((uint)response.Result["time"]);
 			}
 			return null;
 		}
@@ -124,7 +124,7 @@ namespace NBXplorer
 			}
 		}
 
-		public static AuthenticationBuilder AddNBXplorerAuthentication(this AuthenticationBuilder builder)
+		public static AuthenticationBuilder AddNRXplorerAuthentication(this AuthenticationBuilder builder)
 		{
 			builder.Services.AddSingleton<IConfigureOptions<BasicAuthenticationOptions>, ConfigureCookieFileBasedConfiguration>();
 			return builder.AddScheme<Authentication.BasicAuthenticationOptions, Authentication.BasicAuthenticationHandler>("Basic", o =>
@@ -133,12 +133,12 @@ namespace NBXplorer
 			});
 		}
 
-		public static IServiceCollection AddNBXplorer(this IServiceCollection services)
+		public static IServiceCollection AddNRXplorer(this IServiceCollection services)
 		{
 			services.AddSingleton<IObjectModelValidator, NoObjectModelValidator>();
 			services.Configure<MvcOptions>(mvc =>
 			{
-				mvc.Filters.Add(new NBXplorerExceptionFilter());
+				mvc.Filters.Add(new NRXplorerExceptionFilter());
 			});
 
 #if NETCOREAPP21
@@ -155,11 +155,11 @@ namespace NBXplorer
 			services.TryAddSingleton<EventAggregator>();
 			services.TryAddSingleton<AddressPoolService>();
 			services.AddSingleton<IHostedService, AddressPoolService>(o => o.GetRequiredService<AddressPoolService>());
-			services.TryAddSingleton<BitcoinDWaiters>();
+			services.TryAddSingleton<RealbitDWaiters>();
 			services.TryAddSingleton<RebroadcasterHostedService>();
 			services.AddSingleton<IHostedService, ScanUTXOSetService>();
 			services.TryAddSingleton<ScanUTXOSetServiceAccessor>();
-			services.AddSingleton<IHostedService, BitcoinDWaiters>(o => o.GetRequiredService<BitcoinDWaiters>());
+			services.AddSingleton<IHostedService, RealbitDWaiters>(o => o.GetRequiredService<RealbitDWaiters>());
 			services.AddSingleton<IHostedService, RebroadcasterHostedService>(o => o.GetRequiredService<RebroadcasterHostedService>());
 			services.AddSingleton<IHostedService, BrokerHostedService>();
 
@@ -174,7 +174,7 @@ namespace NBXplorer
 				return new KeyPathTemplates(conf.CustomKeyPathTemplate);
 			});
 
-			services.AddSingleton<NBXplorerNetworkProvider>(o =>
+			services.AddSingleton<NRXplorerNetworkProvider>(o =>
 			{
 				var c = o.GetRequiredService<ExplorerConfiguration>();
 				return c.NetworkProvider;

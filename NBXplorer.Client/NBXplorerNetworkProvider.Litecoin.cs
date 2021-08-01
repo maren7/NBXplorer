@@ -1,24 +1,24 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitLitecoin(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Litecoin.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Litecoin.Instance, networkType)
 			{
 				MinRPCVersion = 140200,
 				CoinType = networkType == ChainName.Mainnet ? new KeyPath("2'") : new KeyPath("1'"),
 			});
 		}
 
-		public NBXplorerNetwork GetLTC()
+		public NRXplorerNetwork GetLTC()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Litecoin.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Litecoin.Instance.CryptoCode);
 		}
 	}
 }

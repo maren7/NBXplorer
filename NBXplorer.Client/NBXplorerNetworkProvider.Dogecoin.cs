@@ -1,15 +1,15 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitDogecoin(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Dogecoin.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Dogecoin.Instance, networkType)
 			{
 				MinRPCVersion = 140200,
 				ChainLoadingTimeout = TimeSpan.FromHours(1),
@@ -19,9 +19,9 @@ namespace NBXplorer
 			});
 		}
 
-		public NBXplorerNetwork GetDOGE()
+		public NRXplorerNetwork GetDOGE()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Dogecoin.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Dogecoin.Instance.CryptoCode);
 		}
 	}
 }

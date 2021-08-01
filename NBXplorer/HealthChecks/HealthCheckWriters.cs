@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer.HealthChecks
+namespace NRXplorer.HealthChecks
 {
 	public class HealthCheckWriters
 	{

@@ -1,15 +1,15 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Collections.Generic;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
-		public NBXplorerNetworkProvider(ChainName networkType)
+		public NRXplorerNetworkProvider(ChainName networkType)
 		{
 			NetworkType = networkType;
 			InitArgoneum(networkType);
-			InitBitcoin(networkType);
+			InitRealbit(networkType);
 			InitBitcore(networkType);
 			InitLitecoin(networkType);
 			InitDogecoin(networkType);
@@ -43,21 +43,21 @@ namespace NBXplorer
 			private set;
 		}
 
-		public NBXplorerNetwork GetFromCryptoCode(string cryptoCode)
+		public NRXplorerNetwork GetFromCryptoCode(string cryptoCode)
 		{
-			_Networks.TryGetValue(cryptoCode.ToUpperInvariant(), out NBXplorerNetwork network);
+			_Networks.TryGetValue(cryptoCode.ToUpperInvariant(), out NRXplorerNetwork network);
 			return network;
 		}
 
-		public IEnumerable<NBXplorerNetwork> GetAll()
+		public IEnumerable<NRXplorerNetwork> GetAll()
 		{
 			return _Networks.Values;
 		}
 
-		Dictionary<string, NBXplorerNetwork> _Networks = new Dictionary<string, NBXplorerNetwork>();
-		private void Add(NBXplorerNetwork network)
+		Dictionary<string, NRXplorerNetwork> _Networks = new Dictionary<string, NRXplorerNetwork>();
+		private void Add(NRXplorerNetwork network)
 		{
-			if (network.NBitcoinNetwork == null)
+			if (network.NRealbitNetwork == null)
 				return;
 			_Networks.Add(network.CryptoCode, network);
 		}

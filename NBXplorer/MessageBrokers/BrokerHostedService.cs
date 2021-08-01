@@ -4,8 +4,8 @@ using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NBXplorer.Configuration;
-using NBXplorer.Logging;
+using NRXplorer.Configuration;
+using NRXplorer.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System;
@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBXplorer.MessageBrokers
+namespace NRXplorer.MessageBrokers
 {
 	public class BrokerHostedService : IHostedService
 	{
@@ -25,7 +25,7 @@ namespace NBXplorer.MessageBrokers
 		IBrokerClient _senderTransactions = null;
 		ExplorerConfiguration _config;
 
-		public BrokerHostedService(BitcoinDWaiters waiters, ChainProvider chainProvider, EventAggregator eventAggregator, IOptions<ExplorerConfiguration> config, NBXplorerNetworkProvider networks)
+		public BrokerHostedService(RealbitDWaiters waiters, ChainProvider chainProvider, EventAggregator eventAggregator, IOptions<ExplorerConfiguration> config, NRXplorerNetworkProvider networks)
 		{
 			_EventAggregator = eventAggregator;
 			Networks = networks;
@@ -148,8 +148,8 @@ namespace NBXplorer.MessageBrokers
 		{
 			get; set;
 		}
-		public NBXplorerNetworkProvider Networks { get; }
-		public BitcoinDWaiters Waiters
+		public NRXplorerNetworkProvider Networks { get; }
+		public RealbitDWaiters Waiters
 		{
 			get; set;
 		}

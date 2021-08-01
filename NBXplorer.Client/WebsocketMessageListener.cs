@@ -5,11 +5,11 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NBXplorer.Models;
+using NRXplorer.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class WebsocketMessageListener
 	{

@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Reflection;
-using NBitcoin;
+using NRealbit;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using NBitcoin.DataEncoders;
+using NRealbit.DataEncoders;
 
-namespace NBXplorer.ModelBinders
+namespace NRXplorer.ModelBinders
 {
 	public class ScriptModelBinder : IModelBinder
 	{

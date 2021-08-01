@@ -1,12 +1,12 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
-	public class BitcoinStatus
+	public class RealbitStatus
 	{
 		public int Blocks
 		{
@@ -46,7 +46,7 @@ namespace NBXplorer.Models
 	}
 	public class StatusResult
     {
-		public BitcoinStatus BitcoinStatus
+		public RealbitStatus RealbitStatus
 		{
 			get; set;
 		}
@@ -74,7 +74,7 @@ namespace NBXplorer.Models
 			get;
 			set;
 		}
-		[JsonConverter(typeof(NBitcoin.JsonConverters.ChainNameJsonConverter))]
+		[JsonConverter(typeof(NRealbit.JsonConverters.ChainNameJsonConverter))]
 		public ChainName NetworkType
 		{
 			get;

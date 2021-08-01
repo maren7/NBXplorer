@@ -1,21 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NBitcoin;
-using NBitcoin.Altcoins.Elements;
-using NBXplorer.Altcoins.Liquid;
-using NBitcoin.RPC;
-using NBXplorer.Models;
+using NRealbit;
+using NRealbit.Altcoins.Elements;
+using NRXplorer.Altcoins.Liquid;
+using NRealbit.RPC;
+using NRXplorer.Models;
 using System;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class LiquidRepository : Repository
 	{
 		private readonly RPCClient _rpcClient;
 
-		internal LiquidRepository(DBTrie.DBTrieEngine engine, NBXplorerNetwork network, KeyPathTemplates keyPathTemplates,
+		internal LiquidRepository(DBTrie.DBTrieEngine engine, NRXplorerNetwork network, KeyPathTemplates keyPathTemplates,
 			RPCClient rpcClient) : base(engine, network, keyPathTemplates, rpcClient)
 		{
 			_rpcClient = rpcClient;
@@ -44,7 +44,7 @@ namespace NBXplorer
 				}
 			}
 
-			public override ITrackedTransactionSerializable CreateBitcoinSerializable()
+			public override ITrackedTransactionSerializable CreateRealbitSerializable()
 			{
 				return new ElementsTransactionMatchData(this);
 			}
@@ -101,7 +101,7 @@ namespace NBXplorer
 		}
 		class ElementsTransactionMatchData : TrackedTransaction.TransactionMatchData
 		{
-			internal class UnblindData : IBitcoinSerializable
+			internal class UnblindData : IRealbitSerializable
 			{
 
 				long _Value;
@@ -143,7 +143,7 @@ namespace NBXplorer
 					}
 				}
 
-				public void ReadWrite(BitcoinStream stream)
+				public void ReadWrite(RealbitStream stream)
 				{
 					stream.ReadWrite(ref _Index);
 					stream.ReadWrite(ref _AssetId);
@@ -174,7 +174,7 @@ namespace NBXplorer
 					_UnblindData.Add(new UnblindData() { Index = unblind.Key, AssetId = unblind.Value.AssetId, Value = unblind.Value.Quantity });
 			}
 
-			public override void ReadWrite(BitcoinStream stream)
+			public override void ReadWrite(RealbitStream stream)
 			{
 				base.ReadWrite(stream);
 				stream.ReadWrite(ref _UnblindData);
@@ -191,8 +191,8 @@ namespace NBXplorer
 			{
 				var keys = keyInfos
 					.Select(kv => (KeyPath: kv.KeyPath,
-								   Address: kv.Address as BitcoinBlindedAddress,
-								   BlindingKey: NBXplorerNetworkProvider.LiquidNBXplorerNetwork.GenerateBlindingKey(ts.DerivationStrategy, kv.KeyPath)))
+								   Address: kv.Address as RealbitBlindedAddress,
+								   BlindingKey: NRXplorerNetworkProvider.LiquidNRXplorerNetwork.GenerateBlindingKey(ts.DerivationStrategy, kv.KeyPath)))
 					.Where(o => o.Address != null)
 					.Select(o => new UnblindTransactionBlindingAddressKey()
 					{
@@ -201,7 +201,7 @@ namespace NBXplorer
 					}).ToList();
 				if (keys.Count != 0)
 				{
-					var unblinded = await _rpcClient.UnblindTransaction(keys, elementsTransaction, Network.NBitcoinNetwork);
+					var unblinded = await _rpcClient.UnblindTransaction(keys, elementsTransaction, Network.NRealbitNetwork);
 					elementsTracked.Unblind(unblinded, true);
 				}
 			}
@@ -221,7 +221,7 @@ namespace NBXplorer
 			trackedTransaction.Unblind(((ElementsTransactionMatchData)tx).Unblind);
 			return trackedTransaction;
 		}
-		protected override ITrackedTransactionSerializable CreateBitcoinSerializableTrackedTransaction(TrackedTransactionKey trackedTransactionKey)
+		protected override ITrackedTransactionSerializable CreateRealbitSerializableTrackedTransaction(TrackedTransactionKey trackedTransactionKey)
 		{
 			return new ElementsTransactionMatchData(trackedTransactionKey);
 		}

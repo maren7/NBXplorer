@@ -1,7 +1,7 @@
-using NBitcoin;
+using NRealbit;
 using System.Linq;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class WebsocketNotificationSession : NotificationSessionBase, IDisposable
 	{

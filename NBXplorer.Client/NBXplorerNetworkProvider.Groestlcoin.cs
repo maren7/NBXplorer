@@ -1,15 +1,15 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-	public partial class NBXplorerNetworkProvider
+	public partial class NRXplorerNetworkProvider
     {
 		private void InitGroestlcoin(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Groestlcoin.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Groestlcoin.Instance, networkType)
 			{
 				MinRPCVersion = 2160000,
 				CoinType = NetworkType == ChainName.Mainnet ? new KeyPath("17'") : new KeyPath("1'")

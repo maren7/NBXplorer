@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Authentication
+namespace NRXplorer.Authentication
 {
 	public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
 	{

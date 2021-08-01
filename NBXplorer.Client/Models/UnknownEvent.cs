@@ -1,10 +1,10 @@
-﻿using NBXplorer.Models;
+﻿using NRXplorer.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class UnknownEvent : NewEventBase
 	{

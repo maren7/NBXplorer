@@ -1,4 +1,4 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6,16 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class Serializer
 	{
 
-		private readonly NBXplorerNetwork _Network;
-		public Network Network => _Network?.NBitcoinNetwork;
+		private readonly NRXplorerNetwork _Network;
+		public Network Network => _Network?.NRealbitNetwork;
 
 		public JsonSerializerSettings Settings { get; } = new JsonSerializerSettings();
-		public Serializer(NBXplorerNetwork network)
+		public Serializer(NRXplorerNetwork network)
 		{
 			_Network = network;
 			ConfigureSerializer(Settings);
@@ -25,12 +25,12 @@ namespace NBXplorer
 		{
 			if (settings == null)
 				throw new ArgumentNullException(nameof(settings));
-			NBitcoin.JsonConverters.Serializer.RegisterFrontConverters(settings, Network);
+			NRealbit.JsonConverters.Serializer.RegisterFrontConverters(settings, Network);
 			if (_Network != null)
 			{
 				settings.Converters.Insert(0, new JsonConverters.CachedSerializer(_Network));
 			}
-			ReplaceConverter<NBitcoin.JsonConverters.MoneyJsonConverter>(settings, new NBXplorer.JsonConverters.MoneyJsonConverter());
+			ReplaceConverter<NRealbit.JsonConverters.MoneyJsonConverter>(settings, new NRXplorer.JsonConverters.MoneyJsonConverter());
 		}
 
 		private static void ReplaceConverter<T>(JsonSerializerSettings settings, JsonConverter jsonConverter) where T : JsonConverter
@@ -38,7 +38,7 @@ namespace NBXplorer
 			var moneyConverter = settings.Converters.OfType<T>().Single();
 			var index = settings.Converters.IndexOf(moneyConverter);
 			settings.Converters.RemoveAt(index);
-			settings.Converters.Insert(index, new NBXplorer.JsonConverters.MoneyJsonConverter());
+			settings.Converters.Insert(index, new NRXplorer.JsonConverters.MoneyJsonConverter());
 		}
 
 		public T ToObject<T>(string str)

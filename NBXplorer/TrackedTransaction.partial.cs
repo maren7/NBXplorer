@@ -1,15 +1,15 @@
-﻿using NBitcoin;
-using NBXplorer.Models;
+﻿using NRealbit;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public partial class TrackedTransaction
 	{
-		internal class TransactionMiniMatch : IBitcoinSerializable
+		internal class TransactionMiniMatch : IRealbitSerializable
 		{
 
 			public TransactionMiniMatch()
@@ -45,7 +45,7 @@ namespace NBXplorer
 				}
 			}
 
-			public void ReadWrite(BitcoinStream stream)
+			public void ReadWrite(RealbitStream stream)
 			{
 				stream.ReadWrite(ref _Inputs);
 				stream.ReadWrite(ref _Outputs);
@@ -53,7 +53,7 @@ namespace NBXplorer
 		}
 		internal class TransactionMatchData : ITrackedTransactionSerializable
 		{
-			class CoinData : IBitcoinSerializable
+			class CoinData : IRealbitSerializable
 			{
 				public CoinData()
 				{
@@ -81,7 +81,7 @@ namespace NBXplorer
 					}
 				}
 
-				public void ReadWrite(BitcoinStream stream)
+				public void ReadWrite(RealbitStream stream)
 				{
 					stream.ReadWriteAsVarInt(ref _Index);
 					stream.ReadWrite(ref _TxOut);
@@ -164,7 +164,7 @@ namespace NBXplorer
 				}
 			}
 
-			public virtual void ReadWrite(BitcoinStream stream)
+			public virtual void ReadWrite(RealbitStream stream)
 			{
 				if (Key.IsPruned)
 				{
@@ -203,7 +203,7 @@ namespace NBXplorer
 			}
 		}
 
-		internal class TransactionMiniKeyInformation : IBitcoinSerializable
+		internal class TransactionMiniKeyInformation : IRealbitSerializable
 		{
 			public TransactionMiniKeyInformation()
 			{
@@ -236,7 +236,7 @@ namespace NBXplorer
 				}
 			}
 
-			public virtual void ReadWrite(BitcoinStream stream)
+			public virtual void ReadWrite(RealbitStream stream)
 			{
 				stream.ReadWrite(ref _ScriptPubKey);
 				if (stream.Serializing)
@@ -272,7 +272,7 @@ namespace NBXplorer
 		}
 	}
 
-	public interface ITrackedTransactionSerializable : IBitcoinSerializable
+	public interface ITrackedTransactionSerializable : IRealbitSerializable
 	{
 		TrackedTransactionKey Key { get; }
 		IEnumerable<Coin> GetCoins();

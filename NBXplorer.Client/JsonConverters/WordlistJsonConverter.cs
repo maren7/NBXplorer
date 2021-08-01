@@ -1,4 +1,4 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.JsonConverters
+namespace NRXplorer.JsonConverters
 {
 	public class WordlistJsonConverter : JsonConverter
 	{
@@ -32,9 +32,9 @@ namespace NBXplorer.JsonConverters
 			if (reader.TokenType == JsonToken.Null)
 				return null;
 			if (reader.TokenType != JsonToken.String)
-				throw new NBitcoin.JsonConverters.JsonObjectException($"Unexpected json token type, expected String, actual {reader.TokenType}", reader);
+				throw new NRealbit.JsonConverters.JsonObjectException($"Unexpected json token type, expected String, actual {reader.TokenType}", reader);
 			if (!_Wordlists.TryGetValue((string)reader.Value, out var result))
-				throw new NBitcoin.JsonConverters.JsonObjectException($"Invalid wordlist, possible values {string.Join(", ", _Wordlists.Keys.ToArray())} (defaut: English)", reader);
+				throw new NRealbit.JsonConverters.JsonObjectException($"Invalid wordlist, possible values {string.Join(", ", _Wordlists.Keys.ToArray())} (defaut: English)", reader);
 			return result;
 		}
 

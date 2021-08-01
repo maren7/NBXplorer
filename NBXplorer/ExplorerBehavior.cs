@@ -1,24 +1,24 @@
-﻿using NBXplorer.Logging;
+﻿using NRXplorer.Logging;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using NBitcoin;
-using NBitcoin.Protocol;
-using NBitcoin.Protocol.Behaviors;
+using NRealbit;
+using NRealbit.Protocol;
+using NRealbit.Protocol.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using NBitcoin.Crypto;
-using NBXplorer.DerivationStrategy;
+using NRealbit.Crypto;
+using NRXplorer.DerivationStrategy;
 using System.Net.Http;
-using NBXplorer.Models;
-using NBXplorer.Events;
-using NBXplorer.Configuration;
+using NRXplorer.Models;
+using NRXplorer.Events;
+using NRXplorer.Configuration;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class ExplorerBehavior : NodeBehavior
 	{
@@ -208,7 +208,7 @@ namespace NBXplorer
 			return (DateTimeOffset.UtcNow - lastActivity) >= DownloadHangingTimeout;
 		}
 
-		public NBXplorerNetwork Network
+		public NRXplorerNetwork Network
 		{
 			get
 			{

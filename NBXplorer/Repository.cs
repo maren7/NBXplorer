@@ -1,28 +1,28 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Linq;
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 using System.Threading.Tasks;
 using System.Threading;
-using NBitcoin.Altcoins;
-using NBitcoin.RPC;
-using NBXplorer.Logging;
-using NBXplorer.Configuration;
+using NRealbit.Altcoins;
+using NRealbit.RPC;
+using NRXplorer.Logging;
+using NRXplorer.Configuration;
 using Newtonsoft.Json.Linq;
-using static NBXplorer.TrackedTransaction;
+using static NRXplorer.TrackedTransaction;
 using Microsoft.Extensions.Hosting;
 using Microsoft.JSInterop;
 using System.Buffers;
 using DBTrie;
 using DBTrie.Storage.Cache;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class GenerateAddressQuery
 	{
@@ -44,16 +44,16 @@ namespace NBXplorer
 		Dictionary<string, Repository> _Repositories = new Dictionary<string, Repository>();
 		private readonly KeyPathTemplates keyPathTemplates;
 		ExplorerConfiguration _Configuration;
-		private readonly NBXplorerNetworkProvider networks;
+		private readonly NRXplorerNetworkProvider networks;
 
-		public RepositoryProvider(NBXplorerNetworkProvider networks, KeyPathTemplates keyPathTemplates, ExplorerConfiguration configuration)
+		public RepositoryProvider(NRXplorerNetworkProvider networks, KeyPathTemplates keyPathTemplates, ExplorerConfiguration configuration)
 		{
 			this.keyPathTemplates = keyPathTemplates;
 			_Configuration = configuration;
 			this.networks = networks;
 		}
 
-		private ChainConfiguration GetChainSetting(NBXplorerNetwork net)
+		private ChainConfiguration GetChainSetting(NRXplorerNetwork net)
 		{
 			return _Configuration.ChainConfigurations.FirstOrDefault(c => c.CryptoCode == net.CryptoCode);
 		}
@@ -63,7 +63,7 @@ namespace NBXplorer
 			_Repositories.TryGetValue(cryptoCode, out Repository repository);
 			return repository;
 		}
-		public Repository GetRepository(NBXplorerNetwork network)
+		public Repository GetRepository(NRXplorerNetwork network)
 		{
 			return GetRepository(network.CryptoCode);
 		}
@@ -89,7 +89,7 @@ namespace NBXplorer
 					var settings = GetChainSetting(net);
 					if (settings != null)
 					{
-						var repo = net.NBitcoinNetwork.NetworkSet == Liquid.Instance ? new LiquidRepository(_Engine, net, keyPathTemplates, settings.RPC) : new Repository(_Engine, net, keyPathTemplates, settings.RPC);
+						var repo = net.NRealbitNetwork.NetworkSet == Liquid.Instance ? new LiquidRepository(_Engine, net, keyPathTemplates, settings.RPC) : new Repository(_Engine, net, keyPathTemplates, settings.RPC);
 						repo.MaxPoolSize = _Configuration.MaxGapSize;
 						repo.MinPoolSize = _Configuration.MinGapSize;
 						repo.MinUtxoValue = settings.MinUtxoValue;
@@ -116,7 +116,7 @@ namespace NBXplorer
 				}
 				Logs.Explorer.LogInformation($"Defragmentation succeed, {PrettyKB(saved)} saved");
 
-				Logs.Explorer.LogInformation("Applying migration if needed, do not close NBXplorer...");
+				Logs.Explorer.LogInformation("Applying migration if needed, do not close NRXplorer...");
 				int migrated = 0;
 				foreach (var repo in _Repositories.Select(kv => kv.Value))
 				{
@@ -375,12 +375,12 @@ namespace NBXplorer
 			}
 			public async ValueTask Insert(int key, int value)
 			{
-				var bytes = NBitcoin.Utils.ToBytes((uint)value, false);
+				var bytes = NRealbit.Utils.ToBytes((uint)value, false);
 				await Insert(key, bytes);
 			}
 			public async ValueTask Insert(int key, long value)
 			{
-				var bytes = NBitcoin.Utils.ToBytes((ulong)value, false);
+				var bytes = NRealbit.Utils.ToBytes((ulong)value, false);
 				await Insert(key, bytes);
 			}
 		}
@@ -420,11 +420,11 @@ namespace NBXplorer
 			return new Index(tx, $"{_Suffix}Events", string.Empty);
 		}
 
-		protected NBXplorerNetwork _Network;
+		protected NRXplorerNetwork _Network;
 		private readonly KeyPathTemplates keyPathTemplates;
 		private readonly RPCClient rpc;
 
-		public NBXplorerNetwork Network
+		public NRXplorerNetwork Network
 		{
 			get
 			{
@@ -433,7 +433,7 @@ namespace NBXplorer
 		}
 
 		DBTrie.DBTrieEngine engine;
-		internal Repository(DBTrie.DBTrieEngine engine, NBXplorerNetwork network, KeyPathTemplates keyPathTemplates, RPCClient rpc)
+		internal Repository(DBTrie.DBTrieEngine engine, NRXplorerNetwork network, KeyPathTemplates keyPathTemplates, RPCClient rpc)
 		{
 			if (network == null)
 				throw new ArgumentNullException(nameof(network));
@@ -443,7 +443,7 @@ namespace NBXplorer
 			Serializer = new Serializer(_Network);
 			_Network = network;
 			this.engine = engine;
-			_Suffix = network.CryptoCode == "BTC" ? "" : network.CryptoCode;
+			_Suffix = network.CryptoCode == "BRLB" ? "" : network.CryptoCode;
 		}
 
 		public string _Suffix;
@@ -484,7 +484,7 @@ namespace NBXplorer
 				}
 				using var row = enumerator.Current;
 				await enumerator.DisposeAsync();
-				keyInfo = ToObject<KeyPathInformation>(await row.ReadValue()).AddAddress(Network.NBitcoinNetwork);
+				keyInfo = ToObject<KeyPathInformation>(await row.ReadValue()).AddAddress(Network.NRealbitNetwork);
 				if (reserve)
 				{
 					await availableTable.RemoveKey(row.Key);
@@ -643,7 +643,7 @@ namespace NBXplorer
 			{
 				ScriptPubKey = address.ScriptPubKey,
 				TrackedSource = (TrackedSource)address,
-				Address = (address as BitcoinAddress) ?? address.ScriptPubKey.GetDestinationAddress(Network.NBitcoinNetwork)
+				Address = (address as RealbitAddress) ?? address.ScriptPubKey.GetDestinationAddress(Network.NRealbitNetwork)
 			};
 			var bytes = ToBytes(info);
 			await GetScriptsIndex(tx, address.ScriptPubKey).Insert(address.ScriptPubKey.Hash.ToString(), bytes);
@@ -667,7 +667,7 @@ namespace NBXplorer
 			return toGenerate;
 		}
 
-		class TimeStampedTransaction : IBitcoinSerializable
+		class TimeStampedTransaction : IRealbitSerializable
 		{
 
 			public TimeStampedTransaction()
@@ -677,18 +677,18 @@ namespace NBXplorer
 			public TimeStampedTransaction(Network network, ReadOnlyMemory<byte> hex)
 			{
 				var segment = DBTrie.PublicExtensions.GetUnderlyingArraySegment(hex);
-				var stream = new BitcoinStream(segment.Array, segment.Offset, segment.Count);
+				var stream = new RealbitStream(segment.Array, segment.Offset, segment.Count);
 				stream.ConsensusFactory = network.Consensus.ConsensusFactory;
 				this.ReadWrite(stream);
 			}
 
-			public TimeStampedTransaction(NBitcoin.Transaction tx, ulong timestamp)
+			public TimeStampedTransaction(NRealbit.Transaction tx, ulong timestamp)
 			{
 				_TimeStamp = timestamp;
 				_Transaction = tx;
 			}
-			NBitcoin.Transaction _Transaction;
-			public NBitcoin.Transaction Transaction
+			NRealbit.Transaction _Transaction;
+			public NRealbit.Transaction Transaction
 			{
 				get
 				{
@@ -714,7 +714,7 @@ namespace NBXplorer
 				}
 			}
 
-			public void ReadWrite(BitcoinStream stream)
+			public void ReadWrite(RealbitStream stream)
 			{
 				stream.ReadWrite(ref _Transaction);
 
@@ -728,7 +728,7 @@ namespace NBXplorer
 		{
 			get; set;
 		} = 100;
-		public async Task<List<SavedTransaction>> SaveTransactions(DateTimeOffset now, NBitcoin.Transaction[] transactions, uint256 blockHash)
+		public async Task<List<SavedTransaction>> SaveTransactions(DateTimeOffset now, NRealbit.Transaction[] transactions, uint256 blockHash)
 		{
 			var result = new List<SavedTransaction>();
 			transactions = transactions.Distinct().ToArray();
@@ -737,14 +737,14 @@ namespace NBXplorer
 			foreach (var batch in transactions.Batch(BatchSize))
 			{
 				using var tx = await engine.OpenTransaction();
-				var date = NBitcoin.Utils.DateTimeToUnixTime(now);
+				var date = NRealbit.Utils.DateTimeToUnixTime(now);
 				foreach (var btx in batch)
 				{
 					var timestamped = new TimeStampedTransaction(btx, date);
 					var value = timestamped.ToBytes();
 					var key = GetSavedTransactionKey(btx.GetHash(), blockHash);
 					await GetSavedTransactionTable(tx).Insert(key, value);
-					result.Add(ToSavedTransaction(Network.NBitcoinNetwork, key, value));
+					result.Add(ToSavedTransaction(Network.NRealbitNetwork, key, value));
 				}
 				await tx.Commit();
 			}
@@ -753,7 +753,7 @@ namespace NBXplorer
 
 		public class SavedTransaction
 		{
-			public NBitcoin.Transaction Transaction
+			public NRealbit.Transaction Transaction
 			{
 				get; set;
 			}
@@ -777,7 +777,7 @@ namespace NBXplorer
 			{
 				using (row)
 				{
-					SavedTransaction t = ToSavedTransaction(Network.NBitcoinNetwork, row.Key, await row.ReadValue());
+					SavedTransaction t = ToSavedTransaction(Network.NRealbitNetwork, row.Key, await row.ReadValue());
 					saved.Add(t);
 				}
 			}
@@ -793,7 +793,7 @@ namespace NBXplorer
 			}
 			var timeStamped = new TimeStampedTransaction(network, value);
 			t.Transaction = timeStamped.Transaction;
-			t.Timestamp = NBitcoin.Utils.UnixTimeToDateTime(timeStamped.TimeStamp);
+			t.Timestamp = NRealbit.Utils.UnixTimeToDateTime(timeStamped.TimeStamp);
 			t.Transaction.PrecomputeHash(true, false);
 			return t;
 		}
@@ -814,7 +814,7 @@ namespace NBXplorer
 						using (row)
 						{
 							var keyInfo = ToObject<KeyPathInformation>(await row.ReadValue())
-											.AddAddress(Network.NBitcoinNetwork);
+											.AddAddress(Network.NRealbitNetwork);
 
 							// Because xpub are mutable (several xpub map to same script)
 							// an attacker could generate lot's of xpub mapping to the same script
@@ -908,9 +908,9 @@ namespace NBXplorer
 						cancellation.ThrowIfCancellationRequested();
 						var seg = DBTrie.PublicExtensions.GetUnderlyingArraySegment(await row.ReadValue());
 						MemoryStream ms = new MemoryStream(seg.Array, seg.Offset, seg.Count);
-						BitcoinStream bs = new BitcoinStream(ms, false);
-						bs.ConsensusFactory = Network.NBitcoinNetwork.Consensus.ConsensusFactory;
-						var data = CreateBitcoinSerializableTrackedTransaction(TrackedTransactionKey.Parse(row.Key.Span));
+						RealbitStream bs = new RealbitStream(ms, false);
+						bs.ConsensusFactory = Network.NRealbitNetwork.Consensus.ConsensusFactory;
+						var data = CreateRealbitSerializableTrackedTransaction(TrackedTransactionKey.Parse(row.Key.Span));
 						data.ReadWrite(bs);
 						transactions.Add(data);
 						long firstSeen;
@@ -990,8 +990,8 @@ namespace NBXplorer
 		TrackedTransaction ToTrackedTransaction(ITrackedTransactionSerializable tx, TrackedSource trackedSource)
 		{
 			var trackedTransaction = CreateTrackedTransaction(trackedSource, tx);
-			trackedTransaction.Inserted = tx.TickCount == 0 ? NBitcoin.Utils.UnixTimeToDateTime(0) : new DateTimeOffset((long)tx.TickCount, TimeSpan.Zero);
-			trackedTransaction.FirstSeen = tx.FirstSeenTickCount == 0 ? NBitcoin.Utils.UnixTimeToDateTime(0) : new DateTimeOffset((long)tx.FirstSeenTickCount, TimeSpan.Zero);
+			trackedTransaction.Inserted = tx.TickCount == 0 ? NRealbit.Utils.UnixTimeToDateTime(0) : new DateTimeOffset((long)tx.TickCount, TimeSpan.Zero);
+			trackedTransaction.FirstSeen = tx.FirstSeenTickCount == 0 ? NRealbit.Utils.UnixTimeToDateTime(0) : new DateTimeOffset((long)tx.FirstSeenTickCount, TimeSpan.Zero);
 			return trackedTransaction;
 		}
 
@@ -1066,9 +1066,9 @@ namespace NBXplorer
 						}
 					}
 					var ms = new MemoryStream();
-					BitcoinStream bs = new BitcoinStream(ms, true);
-					bs.ConsensusFactory = Network.NBitcoinNetwork.Consensus.ConsensusFactory;
-					var data = value.CreateBitcoinSerializable();
+					RealbitStream bs = new RealbitStream(ms, true);
+					bs.ConsensusFactory = Network.NRealbitNetwork.Consensus.ConsensusFactory;
+					var data = value.CreateRealbitSerializable();
 					bs.ReadWrite(data);
 					await table.Insert(data.Key.ToString(), ms.ToArrayEfficient(), false);
 				}
@@ -1133,15 +1133,15 @@ namespace NBXplorer
 		}
 
 		FixedSizeCache<uint256, uint256> noMatchCache = new FixedSizeCache<uint256, uint256>(5000, k => k);
-		public Task<TrackedTransaction[]> GetMatches(NBitcoin.Transaction tx, uint256 blockId, DateTimeOffset now, bool useCache)
+		public Task<TrackedTransaction[]> GetMatches(NRealbit.Transaction tx, uint256 blockId, DateTimeOffset now, bool useCache)
 		{
 			return GetMatches(new[] { tx }, blockId, now, useCache);
 		}
-		public async Task<TrackedTransaction[]> GetMatches(IList<NBitcoin.Transaction> txs, uint256 blockId, DateTimeOffset now, bool useCache)
+		public async Task<TrackedTransaction[]> GetMatches(IList<NRealbit.Transaction> txs, uint256 blockId, DateTimeOffset now, bool useCache)
 		{
 			foreach (var tx in txs)
 				tx.PrecomputeHash(false, true);
-			var transactionsPerScript = new MultiValueDictionary<Script, NBitcoin.Transaction>();
+			var transactionsPerScript = new MultiValueDictionary<Script, NRealbit.Transaction>();
 			var matches = new Dictionary<string, TrackedTransaction>();
 			HashSet<Script> scripts = new HashSet<Script>(txs.Count);
 			var noMatchTransactions = new HashSet<uint256>(txs.Count);
@@ -1214,7 +1214,7 @@ namespace NBXplorer
 			}
 			return matches.Values.Count == 0 ? Array.Empty<TrackedTransaction>() : matches.Values.ToArray();
 		}
-		public virtual TrackedTransaction CreateTrackedTransaction(TrackedSource trackedSource, TrackedTransactionKey transactionKey, NBitcoin.Transaction tx, Dictionary<Script, KeyPath> knownScriptMapping)
+		public virtual TrackedTransaction CreateTrackedTransaction(TrackedSource trackedSource, TrackedTransactionKey transactionKey, NRealbit.Transaction tx, Dictionary<Script, KeyPath> knownScriptMapping)
 		{
 			return new TrackedTransaction(transactionKey, trackedSource, tx, knownScriptMapping);
 		}
@@ -1228,7 +1228,7 @@ namespace NBXplorer
 						? CreateTrackedTransaction(trackedSource, tx.Key, tx.GetCoins(), tx.KnownKeyPathMapping)
 						: CreateTrackedTransaction(trackedSource, tx.Key, tx.Transaction, tx.KnownKeyPathMapping);
 		}
-		protected virtual ITrackedTransactionSerializable CreateBitcoinSerializableTrackedTransaction(TrackedTransactionKey trackedTransactionKey)
+		protected virtual ITrackedTransactionSerializable CreateRealbitSerializableTrackedTransaction(TrackedTransactionKey trackedTransactionKey)
 		{
 			return new TrackedTransaction.TransactionMatchData(trackedTransactionKey);
 		}
@@ -1237,7 +1237,7 @@ namespace NBXplorer
 			var shouldImportRPC = (await GetMetadata<string>(tx.TrackedSource, WellknownMetadataKeys.ImportAddressToRPC)).AsBoolean();
 			if (!shouldImportRPC)
 				return;
-			var accountKey = await GetMetadata<BitcoinExtKey>(tx.TrackedSource, WellknownMetadataKeys.AccountHDKey);
+			var accountKey = await GetMetadata<RealbitExtKey>(tx.TrackedSource, WellknownMetadataKeys.AccountHDKey);
 			foreach (var keyInfo in keyInfos)
 			{
 				await ImportAddressToRPC(accountKey,
@@ -1246,19 +1246,19 @@ namespace NBXplorer
 			}
 		}
 
-		private async Task ImportAddressToRPC(TrackedSource trackedSource, BitcoinAddress address, KeyPath keyPath)
+		private async Task ImportAddressToRPC(TrackedSource trackedSource, RealbitAddress address, KeyPath keyPath)
 		{
 			var shouldImportRPC = (await GetMetadata<string>(trackedSource, WellknownMetadataKeys.ImportAddressToRPC)).AsBoolean();
 			if (!shouldImportRPC)
 				return;
-			var accountKey = await GetMetadata<BitcoinExtKey>(trackedSource, WellknownMetadataKeys.AccountHDKey);
+			var accountKey = await GetMetadata<RealbitExtKey>(trackedSource, WellknownMetadataKeys.AccountHDKey);
 			await ImportAddressToRPC(accountKey, address, keyPath);
 		}
-		private async Task ImportAddressToRPC(BitcoinExtKey accountKey, BitcoinAddress address, KeyPath keyPath)
+		private async Task ImportAddressToRPC(RealbitExtKey accountKey, RealbitAddress address, KeyPath keyPath)
 		{
 			if (accountKey != null)
 			{
-				await rpc.ImportPrivKeyAsync(accountKey.Derive(keyPath).PrivateKey.GetWif(Network.NBitcoinNetwork), null, false);
+				await rpc.ImportPrivKeyAsync(accountKey.Derive(keyPath).PrivateKey.GetWif(Network.NRealbitNetwork), null, false);
 			}
 			else
 			{
@@ -1318,7 +1318,7 @@ namespace NBXplorer
 			}
 			catch when (!cancellationToken.IsCancellationRequested)
 			{
-				Logs.Explorer.LogWarning($"{Network.CryptoCode}: Careful, you are probably running low on storage space, so we attempt defragmentation directly on the table, please do not close NBXplorer during the defragmentation.");
+				Logs.Explorer.LogWarning($"{Network.CryptoCode}: Careful, you are probably running low on storage space, so we attempt defragmentation directly on the table, please do not close NRXplorer during the defragmentation.");
 				saved = await table.UnsafeDefragment(cancellationToken);
 			}
 			await tx.Commit();

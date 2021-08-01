@@ -1,9 +1,9 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.DerivationStrategy
+namespace NRXplorer.DerivationStrategy
 {
 	public class Derivation
 	{

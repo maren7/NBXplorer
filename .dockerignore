@@ -121,5 +121,5 @@ bower_components
 output
 
 .vs
-NBXplorer.Tests/
+NRXplorer.Tests/
 **/launchSettings.json

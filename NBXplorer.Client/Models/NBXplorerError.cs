@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
-	public class NBXplorerException : Exception
+	public class NRXplorerException : Exception
 	{
-		public NBXplorerException(NBXplorerError error):base(error.Message)
+		public NRXplorerException(NRXplorerError error):base(error.Message)
 		{
 			Error = error;
 		}
 
-		public NBXplorerError Error
+		public NRXplorerError Error
 		{
 			get; set;
 		}
 	}
-	public class NBXplorerError
+	public class NRXplorerError
 	{
-		public NBXplorerError()
+		public NRXplorerError()
 		{
 
 		}
-		public NBXplorerError(int httpCode, string code, string message)
+		public NRXplorerError(int httpCode, string code, string message)
 		{
 			HttpCode = httpCode;
 			Code = code;
@@ -41,9 +41,9 @@ namespace NBXplorer.Models
 			get; set;
 		}
 
-		public NBXplorerException AsException()
+		public NRXplorerException AsException()
 		{
-			return new NBXplorerException(this);
+			return new NRXplorerException(this);
 		}
 	}
 }

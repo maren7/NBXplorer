@@ -1,13 +1,13 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Microsoft.Extensions.Logging;
-using NBXplorer.Logging;
+using NRXplorer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NBXplorer.Models;
+using NRXplorer.Models;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public enum AnnotatedTransactionType
 	{

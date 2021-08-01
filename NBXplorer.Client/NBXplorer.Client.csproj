@@ -5,12 +5,12 @@
 		<Company>Digital Garage</Company>
 		<Version>4.0.2</Version>
 		<Copyright>Copyright © Digital Garage 2017</Copyright>
-		<Description>Client API for the minimalist HD Wallet Tracker NBXplorer</Description>
-		<PackageIconUrl>https://aois.blob.core.windows.net/public/Bitcoin.png</PackageIconUrl>
-		<PackageTags>bitcoin</PackageTags>
-		<PackageProjectUrl>https://github.com/dgarage/NBXplorer/</PackageProjectUrl>
+		<Description>Client API for the minimalist HD Wallet Tracker NRXplorer</Description>
+		<PackageIconUrl>https://aois.blob.core.windows.net/public/Realbit.png</PackageIconUrl>
+		<PackageTags>realbit</PackageTags>
+		<PackageProjectUrl>https://github.com/dgarage/NRXplorer/</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RepositoryUrl>https://github.com/dgarage/NBXplorer</RepositoryUrl>
+		<RepositoryUrl>https://github.com/dgarage/NRXplorer</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<LangVersion>8.0</LangVersion>
 	</PropertyGroup>
@@ -24,8 +24,8 @@
 		<Optimize>true</Optimize>
         </PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="NBitcoin" Version="6.0.6" />
-		<PackageReference Include="NBitcoin.Altcoins" Version="3.0.3" />
+		<PackageReference Include="NRealbit" Version="6.0.6" />
+		<PackageReference Include="NRealbit.Altcoins" Version="3.0.3" />
 		<PackageReference Include="NicolasDorier.StandardConfiguration" Version="1.0.0.18" />
 		<PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
 	</ItemGroup>

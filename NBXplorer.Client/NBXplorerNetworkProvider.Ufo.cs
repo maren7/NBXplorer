@@ -1,24 +1,24 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitUfo(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Ufo.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Ufo.Instance, networkType)
 			{
 				MinRPCVersion = 150000,
 				CoinType = NetworkType == ChainName.Mainnet ? new KeyPath("202'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetUFO()
+		public NRXplorerNetwork GetUFO()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Ufo.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Ufo.Instance.CryptoCode);
 		}
 	}
 }

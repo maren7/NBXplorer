@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace NBXplorer.ModelBinders
+namespace NRXplorer.ModelBinders
 {
     public class UInt256ModelBinding : IModelBinder
     {

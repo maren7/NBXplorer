@@ -1,10 +1,10 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public class RepositoryTester : IDisposable
 	{
@@ -20,7 +20,7 @@ namespace NBXplorer.Tests
 		{
 			_Name = name;
 			ServerTester.DeleteFolderRecursive(name);
-			_Provider = new RepositoryProvider(new NBXplorerNetworkProvider(ChainName.Regtest),
+			_Provider = new RepositoryProvider(new NRXplorerNetworkProvider(ChainName.Regtest),
 											   KeyPathTemplates.Default,
 											   new Configuration.ExplorerConfiguration()
 											   {
@@ -29,13 +29,13 @@ namespace NBXplorer.Tests
 												   {
 													   new Configuration.ChainConfiguration()
 													   {
-														   CryptoCode = "BTC",
+														   CryptoCode = "BRLB",
 														   Rescan = false
 													   }
 												   }
 											   });
 			_Provider.StartAsync(default).GetAwaiter().GetResult();
-			_Repository = _Provider.GetRepository(new NBXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode("BTC"));
+			_Repository = _Provider.GetRepository(new NRXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode("BRLB"));
 		}
 
 		public void Dispose()

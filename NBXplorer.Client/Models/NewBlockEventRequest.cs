@@ -1,4 +1,4 @@
-﻿namespace NBXplorer.Models
+﻿namespace NRXplorer.Models
 {
 	public class NewBlockEventRequest : NewEventBase
 	{

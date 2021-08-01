@@ -1,16 +1,16 @@
-﻿using NBitcoin;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+﻿using NRealbit;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public abstract class TrackedSource
 	{
-		public static bool TryParse(string str, out TrackedSource trackedSource, NBXplorerNetwork network)
+		public static bool TryParse(string str, out TrackedSource trackedSource, NRXplorerNetwork network)
 		{
 			if (str == null)
 				throw new ArgumentNullException(nameof(str));
@@ -26,7 +26,7 @@ namespace NBXplorer.Models
 			}
 			else if (strSpan.StartsWith("ADDRESS:".AsSpan(), StringComparison.Ordinal))
 			{
-				if (!AddressTrackedSource.TryParse(strSpan, out var addressTrackedSource, network.NBitcoinNetwork))
+				if (!AddressTrackedSource.TryParse(strSpan, out var addressTrackedSource, network.NRealbitNetwork))
 					return false;
 				trackedSource = addressTrackedSource;
 			}
@@ -70,7 +70,7 @@ namespace NBXplorer.Models
 				throw new ArgumentNullException(nameof(strategy));
 			return new DerivationSchemeTrackedSource(strategy);
 		}
-		public static AddressTrackedSource Create(BitcoinAddress address)
+		public static AddressTrackedSource Create(RealbitAddress address)
 		{
 			if (address == null)
 				throw new ArgumentNullException(nameof(address));
@@ -97,8 +97,8 @@ namespace NBXplorer.Models
 
 	public class AddressTrackedSource : TrackedSource, IDestination
 	{
-		// Note that we should in theory access BitcoinAddress. But parsing BitcoinAddress is very expensive, so we keep storing plain strings
-		public AddressTrackedSource(BitcoinAddress address)
+		// Note that we should in theory access RealbitAddress. But parsing RealbitAddress is very expensive, so we keep storing plain strings
+		public AddressTrackedSource(RealbitAddress address)
 		{
 			if (address == null)
 				throw new ArgumentNullException(nameof(address));
@@ -108,7 +108,7 @@ namespace NBXplorer.Models
 
 		string _FullAddressString;
 
-		public BitcoinAddress Address
+		public RealbitAddress Address
 		{
 			get;
 		}
@@ -126,7 +126,7 @@ namespace NBXplorer.Models
 				return false;
 			try
 			{
-				addressTrackedSource = new AddressTrackedSource(BitcoinAddress.Create(strSpan.Slice("ADDRESS:".Length).ToString(), network));
+				addressTrackedSource = new AddressTrackedSource(RealbitAddress.Create(strSpan.Slice("ADDRESS:".Length).ToString(), network));
 				return true;
 			}
 			catch { return false; }
@@ -154,7 +154,7 @@ namespace NBXplorer.Models
 
 		public DerivationStrategy.DerivationStrategyBase DerivationStrategy { get; }
 
-		public static bool TryParse(ReadOnlySpan<char> strSpan, out DerivationSchemeTrackedSource derivationSchemeTrackedSource, NBXplorerNetwork network)
+		public static bool TryParse(ReadOnlySpan<char> strSpan, out DerivationSchemeTrackedSource derivationSchemeTrackedSource, NRXplorerNetwork network)
 		{
 			if (strSpan == null)
 				throw new ArgumentNullException(nameof(strSpan));

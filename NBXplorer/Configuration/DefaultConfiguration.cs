@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using NBXplorer.Logging;
+using NRXplorer.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,29 +8,29 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Threading.Tasks;
-using NBitcoin;
+using NRealbit;
 using System.Text;
 using CommandLine;
 
-namespace NBXplorer.Configuration
+namespace NRXplorer.Configuration
 {
 	public class DefaultConfiguration : StandardConfiguration.DefaultConfiguration
 	{
 		protected override CommandLineApplication CreateCommandLineApplicationCore()
 		{
-			var provider = new NBXplorerNetworkProvider(ChainName.Mainnet);
+			var provider = new NRXplorerNetworkProvider(ChainName.Mainnet);
 			var chains = string.Join(",", provider.GetAll().Select(n => n.CryptoCode.ToLowerInvariant()).ToArray());
 			CommandLineApplication app = new CommandLineApplication(true)
 			{
-				FullName = "NBXplorer\r\nLightweight block explorer for tracking HD wallets",
-				Name = "NBXplorer"
+				FullName = "NRXplorer\r\nLightweight block explorer for tracking HD wallets",
+				Name = "NRXplorer"
 			};
 			app.HelpOption("-? | -h | --help");
 			app.Option("-n | --network", $"Set the network among (mainnet,testnet,regtest) (default: mainnet)", CommandOptionType.SingleValue);
 			app.Option("--testnet | -testnet", $"Use testnet", CommandOptionType.BoolValue);
 			app.Option("--regtest | -regtest", $"Use regtest", CommandOptionType.BoolValue);
 			app.Option("--signet | -signet", $"Use signet", CommandOptionType.BoolValue);
-			app.Option("--chains", $"Chains to support comma separated (default: btc, available: {chains})", CommandOptionType.SingleValue);
+			app.Option("--chains", $"Chains to support comma separated (default: brlb, available: {chains})", CommandOptionType.SingleValue);
 
 			app.Option($"--dbcache", $"If more than 0, the size of the cache for the database, in MB. Else, no limit on the size of the cache. (default: 50)", CommandOptionType.SingleValue);
 			foreach (var network in provider.GetAll())
@@ -44,8 +44,8 @@ namespace NBXplorer.Configuration
 				app.Option($"--{crypto}rpcurl", $"The RPC server url (default: default rpc server depended on the network)", CommandOptionType.SingleValue);
 				app.Option($"--{crypto}startheight", $"The height where starting the scan (default: where your rpc server was synched when you first started this program)", CommandOptionType.SingleValue);
 				app.Option($"--{crypto}minutxovalue", $"The minimum value of tracked UTXOs, any UTXO with value less than this is ignored. (default: 1 (satoshi))", CommandOptionType.SingleValue);
-				app.Option($"--{crypto}nodeendpoint", $"The p2p connection to a Bitcoin node, make sure you are whitelisted (default: default p2p node on localhost, depends on network)", CommandOptionType.SingleValue);
-				app.Option($"--{crypto}hastxindex", "If true, NBXplorer will try to fetch missing transactions from the local node (default: false)", CommandOptionType.BoolValue);
+				app.Option($"--{crypto}nodeendpoint", $"The p2p connection to a Realbit node, make sure you are whitelisted (default: default p2p node on localhost, depends on network)", CommandOptionType.SingleValue);
+				app.Option($"--{crypto}hastxindex", "If true, NRXplorer will try to fetch missing transactions from the local node (default: false)", CommandOptionType.BoolValue);
 				app.Option($"--{crypto}exposerpc", $"Expose the node RPCs through the REST API (default: false)", CommandOptionType.SingleValue);
 			}
 
@@ -62,10 +62,10 @@ namespace NBXplorer.Configuration
 			app.Option("--rmqtranex", "[For RabbitMq] Name of exchange to push transaction messages.", CommandOptionType.SingleValue);
 			app.Option("--rmqblockex", "[For RabbitMq] Name of exchange to push block messages.", CommandOptionType.SingleValue);
 
-			app.Option("--customkeypathtemplate", $"Define an additional derivation path tracked by NBXplorer (Format: m/1/392/*/29, default: empty)", CommandOptionType.SingleValue);
+			app.Option("--customkeypathtemplate", $"Define an additional derivation path tracked by NRXplorer (Format: m/1/392/*/29, default: empty)", CommandOptionType.SingleValue);
 			app.Option("--maxgapsize", $"The maximum gap address count on which the explorer will track derivation schemes (default: 30)", CommandOptionType.SingleValue);
 			app.Option("--mingapsize", $"The minimum gap address count on which the explorer will track derivation schemes (default: 20)", CommandOptionType.SingleValue);
-			app.Option("--trimevents", $"When NBXplorer starts, NBXplorer will remove old events to reach this count. No trimming if equals to less than 0 (default: -1)", CommandOptionType.SingleValue);
+			app.Option("--trimevents", $"When NRXplorer starts, NRXplorer will remove old events to reach this count. No trimming if equals to less than 0 (default: -1)", CommandOptionType.SingleValue);
 			app.Option("--signalfilesdir", $"The directory where files signaling if a chain is ready is created (default: the network specific datadir)", CommandOptionType.SingleValue);
 			app.Option("--noauth", $"Disable cookie authentication", CommandOptionType.BoolValue);
 			app.Option("--instancename", $"Define an instance name for this server that, if not null, will show in status response and in HTTP response headers (default: empty)", CommandOptionType.SingleValue);
@@ -125,20 +125,20 @@ namespace NBXplorer.Configuration
 			var networkType = GetNetworkType(conf);
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("####Common Commands####");
-			builder.AppendLine("####If Bitcoin Core is running with default settings, you should not need to modify this file####");
+			builder.AppendLine("####If Realbit Core is running with default settings, you should not need to modify this file####");
 			builder.AppendLine("####All those options can be passed by through command like arguments (ie `-port=19382`)####");
 
 
-			foreach(var network in new NBXplorerNetworkProvider(networkType).GetAll())
+			foreach(var network in new NRXplorerNetworkProvider(networkType).GetAll())
 			{
 				var cryptoCode = network.CryptoCode.ToLowerInvariant();
 				builder.AppendLine("## This is the RPC Connection to your node");
-				builder.AppendLine($"#{cryptoCode}.rpc.url=http://127.0.0.1:" + network.NBitcoinNetwork.RPCPort + "/");
+				builder.AppendLine($"#{cryptoCode}.rpc.url=http://127.0.0.1:" + network.NRealbitNetwork.RPCPort + "/");
 				builder.AppendLine("#By user name and password");
-				builder.AppendLine($"#{cryptoCode}.rpc.user=bitcoinuser");
-				builder.AppendLine($"#{cryptoCode}.rpc.password=bitcoinpassword");
+				builder.AppendLine($"#{cryptoCode}.rpc.user=realbituser");
+				builder.AppendLine($"#{cryptoCode}.rpc.password=realbitpassword");
 				builder.AppendLine("#By cookie file");
-				builder.AppendLine($"#{cryptoCode}.rpc.cookiefile=yourbitcoinfolder/.cookie");
+				builder.AppendLine($"#{cryptoCode}.rpc.cookiefile=yourrealbitfolder/.cookie");
 				builder.AppendLine("#By raw authentication string");
 				builder.AppendLine($"#{cryptoCode}.rpc.auth=walletuser:password");
 				builder.AppendLine();
@@ -162,7 +162,7 @@ namespace NBXplorer.Configuration
 			builder.AppendLine("## Expose the node RPC through the REST API");
 			builder.AppendLine($"#exposerpc=0");
 			builder.AppendLine("## What crypto currencies is supported");
-			var chains = string.Join(',', new NBXplorerNetworkProvider(ChainName.Mainnet)
+			var chains = string.Join(',', new NRXplorerNetworkProvider(ChainName.Mainnet)
 				.GetAll()
 				.Select(c => c.CryptoCode.ToLowerInvariant())
 				.ToArray());
@@ -190,9 +190,9 @@ namespace NBXplorer.Configuration
 			return builder.ToString();
 		}
 
-		private NBXplorerDefaultSettings GetDefaultSettings(IConfiguration conf)
+		private NRXplorerDefaultSettings GetDefaultSettings(IConfiguration conf)
 		{
-			return NBXplorerDefaultSettings.GetDefaultSettings(GetNetworkType(conf));
+			return NRXplorerDefaultSettings.GetDefaultSettings(GetNetworkType(conf));
 		}
 
 		protected override IPEndPoint GetDefaultEndpoint(IConfiguration conf)

@@ -1,12 +1,12 @@
-﻿using NBXplorer.DerivationStrategy;
+﻿using NRXplorer.DerivationStrategy;
 using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin;
-using NBitcoin.Crypto;
+using NRealbit;
+using NRealbit.Crypto;
 
-namespace NBXplorer.DerivationStrategy
+namespace NRXplorer.DerivationStrategy
 {
 	public class P2WSHDerivationStrategy : DerivationStrategyBase
 	{

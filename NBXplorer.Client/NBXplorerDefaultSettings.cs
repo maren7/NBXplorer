@@ -1,13 +1,13 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public class NBXplorerDefaultSettings
+    public class NRXplorerDefaultSettings
     {
 
 		public static string GetFolderName(ChainName chainName)
@@ -23,7 +23,7 @@ namespace NBXplorer
 			return chainName.ToString();
 		}
 
-		static Dictionary<ChainName, NBXplorerDefaultSettings> _Settings = new Dictionary<ChainName, NBXplorerDefaultSettings>();
+		static Dictionary<ChainName, NRXplorerDefaultSettings> _Settings = new Dictionary<ChainName, NRXplorerDefaultSettings>();
 		public string DefaultDataDirectory
 		{
 			get;
@@ -50,7 +50,7 @@ namespace NBXplorer
 			set;
 		}
 
-		public static NBXplorerDefaultSettings GetDefaultSettings(ChainName networkType)
+		public static NRXplorerDefaultSettings GetDefaultSettings(ChainName networkType)
 		{
 			if (_Settings.TryGetValue(networkType, out var v))
 				return v;
@@ -58,8 +58,8 @@ namespace NBXplorer
 			{
 				if (_Settings.TryGetValue(networkType, out v))
 					return v;
-				var settings = new NBXplorerDefaultSettings();
-				settings.DefaultDataDirectory = StandardConfiguration.DefaultDataDirectory.GetDirectory("NBXplorer", GetFolderName(networkType), false);
+				var settings = new NRXplorerDefaultSettings();
+				settings.DefaultDataDirectory = StandardConfiguration.DefaultDataDirectory.GetDirectory("NRXplorer", GetFolderName(networkType), false);
 				settings.DefaultConfigurationFile = Path.Combine(settings.DefaultDataDirectory, "settings.config");
 				settings.DefaultCookieFile = Path.Combine(settings.DefaultDataDirectory, ".cookie");
 				settings.DefaultPort = (networkType == ChainName.Mainnet ? 24444 :

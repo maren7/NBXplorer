@@ -1,4 +1,4 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
 using System.IO;
 using System;
@@ -12,11 +12,11 @@ using Xunit.Abstractions;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
-using NBitcoin.Crypto;
+using NRealbit.Crypto;
 using Microsoft.Extensions.DependencyInjection;
-using NBXplorer.Analytics;
+using NRXplorer.Analytics;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public class AnalysisTests
 	{

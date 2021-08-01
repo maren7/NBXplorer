@@ -1,46 +1,46 @@
-﻿using NBitcoin.RPC;
+﻿using NRealbit.RPC;
 using Microsoft.Extensions.Logging;
-using NBXplorer.Logging;
+using NRXplorer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NBXplorer.Configuration;
-using NBitcoin.Protocol;
+using NRXplorer.Configuration;
+using NRealbit.Protocol;
 using System.Threading;
 using System.IO;
-using NBitcoin;
+using NRealbit;
 using System.Net;
-using NBitcoin.Protocol.Behaviors;
+using NRealbit.Protocol.Behaviors;
 using Microsoft.Extensions.Hosting;
-using NBXplorer.Events;
+using NRXplorer.Events;
 using Newtonsoft.Json.Linq;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-	public enum BitcoinDWaiterState
+	public enum RealbitDWaiterState
 	{
 		NotStarted,
 		CoreSynching,
-		NBXplorerSynching,
+		NRXplorerSynching,
 		Ready
 	}
 
-	public class BitcoinDWaiters : IHostedService
+	public class RealbitDWaiters : IHostedService
 	{
-		Dictionary<string, BitcoinDWaiter> _Waiters;
+		Dictionary<string, RealbitDWaiter> _Waiters;
 		private readonly AddressPoolService addressPool;
-		private readonly NBXplorerNetworkProvider networkProvider;
+		private readonly NRXplorerNetworkProvider networkProvider;
 		private readonly ChainProvider chains;
 		private readonly RepositoryProvider repositoryProvider;
 		private readonly ExplorerConfiguration config;
 		private readonly RPCClientProvider rpcProvider;
 		private readonly EventAggregator eventAggregator;
 
-		public BitcoinDWaiters(
+		public RealbitDWaiters(
 							AddressPoolService addressPool,
-							  NBXplorerNetworkProvider networkProvider,
+							  NRXplorerNetworkProvider networkProvider,
 							  ChainProvider chains,
 							  RepositoryProvider repositoryProvider,
 							  ExplorerConfiguration config,
@@ -65,7 +65,7 @@ namespace NBXplorer
 							  Chain: chains.GetChain(s),
 							  Network: s))
 				.Where(s => s.Repository != null && s.RPCClient != null && s.Chain != null)
-				.Select(s => new BitcoinDWaiter(s.RPCClient,
+				.Select(s => new RealbitDWaiter(s.RPCClient,
 												config,
 												networkProvider.GetFromCryptoCode(s.Network.CryptoCode),
 												s.Chain,
@@ -81,26 +81,26 @@ namespace NBXplorer
 			await Task.WhenAll(_Waiters.Select(s => s.Value.StopAsync(cancellationToken)).ToArray());
 		}
 
-		public BitcoinDWaiter GetWaiter(NBXplorerNetwork network)
+		public RealbitDWaiter GetWaiter(NRXplorerNetwork network)
 		{
 			return GetWaiter(network.CryptoCode);
 		}
-		public BitcoinDWaiter GetWaiter(string cryptoCode)
+		public RealbitDWaiter GetWaiter(string cryptoCode)
 		{
-			_Waiters.TryGetValue(cryptoCode.ToUpperInvariant(), out BitcoinDWaiter waiter);
+			_Waiters.TryGetValue(cryptoCode.ToUpperInvariant(), out RealbitDWaiter waiter);
 			return waiter;
 		}
 
-		public IEnumerable<BitcoinDWaiter> All()
+		public IEnumerable<RealbitDWaiter> All()
 		{
 			return _Waiters.Values;
 		}
 	}
 
-	public class BitcoinDWaiter : IHostedService
+	public class RealbitDWaiter : IHostedService
 	{
 		RPCClient _OriginalRPC;
-		NBXplorerNetwork _Network;
+		NRXplorerNetwork _Network;
 		ExplorerConfiguration _Configuration;
 		private ExplorerBehavior _ExplorerPrototype;
 		SlimChain _Chain;
@@ -108,10 +108,10 @@ namespace NBXplorer
 		private readonly ChainConfiguration _ChainConfiguration;
 		readonly string RPCReadyFile;
 
-		public BitcoinDWaiter(
+		public RealbitDWaiter(
 			RPCClient rpc,
 			ExplorerConfiguration configuration,
-			NBXplorerNetwork network,
+			NRXplorerNetwork network,
 			SlimChain chain,
 			Repository repository,
 			AddressPoolService addressPoolService,
@@ -123,7 +123,7 @@ namespace NBXplorer
 			_Configuration = configuration;
 			_Network = network;
 			_Chain = chain;
-			State = BitcoinDWaiterState.NotStarted;
+			State = RealbitDWaiterState.NotStarted;
 			_EventAggregator = eventAggregator;
 			_ChainConfiguration = _Configuration.ChainConfigurations.First(c => c.CryptoCode == _Network.CryptoCode);
 			_ExplorerPrototype = new ExplorerBehavior(repository, chain, addressPoolService, eventAggregator) { StartHeight = _ChainConfiguration.StartHeight };
@@ -139,7 +139,7 @@ namespace NBXplorer
 		private Node _Node;
 
 
-		public NBXplorerNetwork Network
+		public NRXplorerNetwork Network
 		{
 			get
 			{
@@ -155,7 +155,7 @@ namespace NBXplorer
 			}
 		}
 
-		public BitcoinDWaiterState State
+		public RealbitDWaiterState State
 		{
 			get;
 			private set;
@@ -167,9 +167,9 @@ namespace NBXplorer
 		{
 			get
 			{
-				return State == BitcoinDWaiterState.Ready ||
-					State == BitcoinDWaiterState.CoreSynching ||
-					State == BitcoinDWaiterState.NBXplorerSynching;
+				return State == RealbitDWaiterState.Ready ||
+					State == RealbitDWaiterState.CoreSynching ||
+					State == RealbitDWaiterState.NRXplorerSynching;
 			}
 		}
 		IDisposable _Subscription;
@@ -178,7 +178,7 @@ namespace NBXplorer
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
 			if (_Disposed)
-				throw new ObjectDisposedException(nameof(BitcoinDWaiter));
+				throw new ObjectDisposedException(nameof(RealbitDWaiter));
 
 			_Cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 			_Loop = StartLoop(_Cts.Token, _Tick);
@@ -253,7 +253,7 @@ namespace NBXplorer
 			_Cts.Cancel();
 			_Subscription.Dispose();
 			EnsureNodeDisposed();
-			State = BitcoinDWaiterState.NotStarted;
+			State = RealbitDWaiterState.NotStarted;
 			_Chain = null;
 			try
 			{
@@ -268,15 +268,15 @@ namespace NBXplorer
 			var oldState = State;
 			switch (State)
 			{
-				case BitcoinDWaiterState.NotStarted:
+				case RealbitDWaiterState.NotStarted:
 					await RPCArgs.TestRPCAsync(_Network, _OriginalRPC, token);
 					_OriginalRPC.Capabilities = _OriginalRPC.Capabilities;
 					GetBlockchainInfoResponse blockchainInfo = null;
 					try
 					{
 						blockchainInfo = await _OriginalRPC.GetBlockchainInfoAsyncEx();
-						if (_Network.CryptoCode == "BTC" &&
-							_Network.NBitcoinNetwork.ChainName == ChainName.Mainnet &&
+						if (_Network.CryptoCode == "BRLB" &&
+							_Network.NRealbitNetwork.ChainName == ChainName.Mainnet &&
 							!_BanListLoaded)
 						{
 							try
@@ -289,7 +289,7 @@ namespace NBXplorer
 								Logs.Explorer.LogWarning($"{Network.CryptoCode}: Error while trying to load the ban list, skipping... ({ex.Message})");
 							}
 						}
-						if (blockchainInfo != null && _Network.NBitcoinNetwork.ChainName == ChainName.Regtest)
+						if (blockchainInfo != null && _Network.NRealbitNetwork.ChainName == ChainName.Regtest)
 						{
 							if (await WarmupBlockchain())
 							{
@@ -304,15 +304,15 @@ namespace NBXplorer
 					}
 					if (IsSynchingCore(blockchainInfo))
 					{
-						State = BitcoinDWaiterState.CoreSynching;
+						State = RealbitDWaiterState.CoreSynching;
 					}
 					else
 					{
-						await ConnectToBitcoinD(token);
-						State = BitcoinDWaiterState.NBXplorerSynching;
+						await ConnectToRealbitD(token);
+						State = RealbitDWaiterState.NRXplorerSynching;
 					}
 					break;
-				case BitcoinDWaiterState.CoreSynching:
+				case RealbitDWaiterState.CoreSynching:
 					GetBlockchainInfoResponse blockchainInfo2 = null;
 					try
 					{
@@ -321,35 +321,35 @@ namespace NBXplorer
 					catch (Exception ex)
 					{
 						Logs.Configuration.LogError(ex, $"{_Network.CryptoCode}: Failed to connect to RPC");
-						State = BitcoinDWaiterState.NotStarted;
+						State = RealbitDWaiterState.NotStarted;
 						break;
 					}
 					if (!IsSynchingCore(blockchainInfo2))
 					{
-						await ConnectToBitcoinD(token);
-						State = BitcoinDWaiterState.NBXplorerSynching;
+						await ConnectToRealbitD(token);
+						State = RealbitDWaiterState.NRXplorerSynching;
 					}
 					break;
-				case BitcoinDWaiterState.NBXplorerSynching:
+				case RealbitDWaiterState.NRXplorerSynching:
 					var explorer = GetExplorerBehavior();
 					if (explorer == null)
 					{
-						State = BitcoinDWaiterState.NotStarted;
+						State = RealbitDWaiterState.NotStarted;
 					}
 					else if (!explorer.IsSynching())
 					{
-						State = BitcoinDWaiterState.Ready;
+						State = RealbitDWaiterState.Ready;
 					}
 					break;
-				case BitcoinDWaiterState.Ready:
+				case RealbitDWaiterState.Ready:
 					var explorer2 = GetExplorerBehavior();
 					if (explorer2 == null)
 					{
-						State = BitcoinDWaiterState.NotStarted;
+						State = RealbitDWaiterState.NotStarted;
 					}
 					else if (explorer2.IsSynching())
 					{
-						State = BitcoinDWaiterState.NBXplorerSynching;
+						State = RealbitDWaiterState.NRXplorerSynching;
 					}
 					break;
 				default:
@@ -359,15 +359,15 @@ namespace NBXplorer
 
 			if (changed)
 			{
-				if (oldState == BitcoinDWaiterState.NotStarted)
+				if (oldState == RealbitDWaiterState.NotStarted)
 					NetworkInfo = await _OriginalRPC.GetNetworkInfoAsync();
-				_EventAggregator.Publish(new BitcoinDStateChangedEvent(_Network, oldState, State));
-				if (State == BitcoinDWaiterState.Ready)
+				_EventAggregator.Publish(new RealbitDStateChangedEvent(_Network, oldState, State));
+				if (State == RealbitDWaiterState.Ready)
 				{
-					await File.WriteAllTextAsync(RPCReadyFile, NBitcoin.Utils.DateTimeToUnixTime(DateTimeOffset.UtcNow).ToString());
+					await File.WriteAllTextAsync(RPCReadyFile, NRealbit.Utils.DateTimeToUnixTime(DateTimeOffset.UtcNow).ToString());
 				}
 			}
-			if (State != BitcoinDWaiterState.Ready)
+			if (State != RealbitDWaiterState.Ready)
 			{
 				EnsureRPCReadyFileDeleted();
 			}
@@ -392,7 +392,7 @@ namespace NBXplorer
 
 		private async Task LoadBanList()
 		{
-			var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("NBXplorer.banlist.cli.txt");
+			var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("NRXplorer.banlist.cli.txt");
 			string content = null;
 			using (var reader = new StreamReader(stream, Encoding.UTF8))
 			{
@@ -415,7 +415,7 @@ namespace NBXplorer
 			Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Node banlist loaded");
 		}
 
-		private async Task ConnectToBitcoinD(CancellationToken cancellation)
+		private async Task ConnectToRealbitD(CancellationToken cancellation)
 		{
 			var node = GetHandshakedNode();
 			if (node != null)
@@ -438,7 +438,7 @@ namespace NBXplorer
 				{
 					timeout.CancelAfter(_Network.ChainLoadingTimeout);
 					Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Trying to connect via the P2P protocol to trusted node ({_ChainConfiguration.NodeEndpoint.ToEndpointString()})...");
-					var userAgent = "NBXplorer-" + RandomUtils.GetInt64();
+					var userAgent = "NRXplorer-" + RandomUtils.GetInt64();
 					bool handshaked = false;
 					bool connected = false;
 					bool chainLoaded = false;
@@ -447,7 +447,7 @@ namespace NBXplorer
 						try
 						{
 							handshakeTimeout.CancelAfter(TimeSpan.FromSeconds(10));
-							node = await Node.ConnectAsync(_Network.NBitcoinNetwork, _ChainConfiguration.NodeEndpoint, new NodeConnectionParameters()
+							node = await Node.ConnectAsync(_Network.NRealbitNetwork, _ChainConfiguration.NodeEndpoint, new NodeConnectionParameters()
 							{
 								UserAgent = userAgent,
 								ConnectCancellation = handshakeTimeout.Token,
@@ -458,7 +458,7 @@ namespace NBXplorer
 							node.VersionHandshake(handshakeTimeout.Token);
 							handshaked = true;
 							Logs.Explorer.LogInformation($"{Network.CryptoCode}: Handshaked");
-							var loadChainTimeout = _Network.NBitcoinNetwork.ChainName == ChainName.Regtest ? TimeSpan.FromSeconds(5) : _Network.ChainCacheLoadingTimeout;
+							var loadChainTimeout = _Network.NRealbitNetwork.ChainName == ChainName.Regtest ? TimeSpan.FromSeconds(5) : _Network.ChainCacheLoadingTimeout;
 							if (_Chain.Height < 5)
 								loadChainTimeout = TimeSpan.FromDays(7); // unlimited
 							Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Loading chain from node");
@@ -483,12 +483,12 @@ namespace NBXplorer
 										.FirstOrDefault(p => p.SubVersion == userAgent);
 							if (IsWhitelisted(peer))
 							{
-								Logs.Explorer.LogInformation($"{Network.CryptoCode}: NBXplorer is correctly whitelisted by the node");
+								Logs.Explorer.LogInformation($"{Network.CryptoCode}: NRXplorer is correctly whitelisted by the node");
 							}
 							else
 							{
 								var addressStr = peer.Address is IPEndPoint end ? end.Address.ToString() : peer.Address?.ToString();
-								Logs.Explorer.LogWarning($"{Network.CryptoCode}: Your NBXplorer server is not whitelisted by your node," +
+								Logs.Explorer.LogWarning($"{Network.CryptoCode}: Your NRXplorer server is not whitelisted by your node," +
 									$" you should add \"whitelist={addressStr}\" to the configuration file of your node. (Or use whitebind)");
 							}
 						}
@@ -496,20 +496,20 @@ namespace NBXplorer
 						{
 							if (!connected)
 							{
-								Logs.Explorer.LogWarning($"{Network.CryptoCode}: NBXplorer failed to connect to the node via P2P ({_ChainConfiguration.NodeEndpoint.ToEndpointString()}).{Environment.NewLine}" +
+								Logs.Explorer.LogWarning($"{Network.CryptoCode}: NRXplorer failed to connect to the node via P2P ({_ChainConfiguration.NodeEndpoint.ToEndpointString()}).{Environment.NewLine}" +
 									$"It may come from: A firewall blocking the traffic, incorrect IP or port, or your node may not have an available connection slot. {Environment.NewLine}" +
-									$"To make sure your node have an available connection slot, use \"whitebind\" or \"whitelist\" in your node configuration. (typically whitelist=127.0.0.1 if NBXplorer and the node are on the same machine.){Environment.NewLine}");
+									$"To make sure your node have an available connection slot, use \"whitebind\" or \"whitelist\" in your node configuration. (typically whitelist=127.0.0.1 if NRXplorer and the node are on the same machine.){Environment.NewLine}");
 							}
 							else if (!handshaked)
 							{
-								Logs.Explorer.LogWarning($"{Network.CryptoCode}: NBXplorer connected to the remote node but failed to handhsake via P2P.{Environment.NewLine}" +
-									$"Your node may not have an available connection slot, or you may try to connect to the wrong node. (ie, trying to connect to a LTC node on the BTC configuration).{Environment.NewLine}" +
-									$"To make sure your node have an available connection slot, use \"whitebind\" or \"whitelist\" in your node configuration. (typically whitelist=127.0.0.1 if NBXplorer and the node are on the same machine.){Environment.NewLine}");
+								Logs.Explorer.LogWarning($"{Network.CryptoCode}: NRXplorer connected to the remote node but failed to handhsake via P2P.{Environment.NewLine}" +
+									$"Your node may not have an available connection slot, or you may try to connect to the wrong node. (ie, trying to connect to a LTC node on the BRLB configuration).{Environment.NewLine}" +
+									$"To make sure your node have an available connection slot, use \"whitebind\" or \"whitelist\" in your node configuration. (typically whitelist=127.0.0.1 if NRXplorer and the node are on the same machine.){Environment.NewLine}");
 							}
 							else if (!chainLoaded)
 							{
-								Logs.Explorer.LogWarning($"{Network.CryptoCode}: NBXplorer connected and handshaked the remote node but failed to load the chain of header.{Environment.NewLine}" +
-									$"Your connection may be throttled, or you may try to connect to the wrong node. (ie, trying to connect to a LTC node on the BTC configuration).{Environment.NewLine}");
+								Logs.Explorer.LogWarning($"{Network.CryptoCode}: NRXplorer connected and handshaked the remote node but failed to load the chain of header.{Environment.NewLine}" +
+									$"Your connection may be throttled, or you may try to connect to the wrong node. (ie, trying to connect to a LTC node on the BRLB configuration).{Environment.NewLine}");
 							}
 							throw;
 						}
@@ -594,7 +594,7 @@ namespace NBXplorer
 
 		private void SaveChainInCache()
 		{
-			var suffix = _Network.CryptoCode == "BTC" ? "" : _Network.CryptoCode;
+			var suffix = _Network.CryptoCode == "BRLB" ? "" : _Network.CryptoCode;
 			var cachePath = Path.Combine(_Configuration.DataDir, $"{suffix}chain-slim.dat");
 			var cachePathTemp = Path.Combine(_Configuration.DataDir, $"{suffix}chain-slim.dat.temp");
 
@@ -613,14 +613,14 @@ namespace NBXplorer
 
 		private void LoadChainFromCache()
 		{
-			var suffix = _Network.CryptoCode == "BTC" ? "" : _Network.CryptoCode;
+			var suffix = _Network.CryptoCode == "BRLB" ? "" : _Network.CryptoCode;
 			{
 				var legacyCachePath = Path.Combine(_Configuration.DataDir, $"{suffix}chain.dat");
 				if (_Configuration.CacheChain && File.Exists(legacyCachePath))
 				{
 					Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Loading chain from cache...");
-					var chain = new ConcurrentChain(_Network.NBitcoinNetwork);
-					chain.Load(File.ReadAllBytes(legacyCachePath), _Network.NBitcoinNetwork);
+					var chain = new ConcurrentChain(_Network.NRealbitNetwork);
+					chain.Load(File.ReadAllBytes(legacyCachePath), _Network.NRealbitNetwork);
 					LoadSlimAndSaveToSlimFormat(chain);
 					File.Delete(legacyCachePath);
 					Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Height: " + _Chain.Height);
@@ -633,8 +633,8 @@ namespace NBXplorer
 				if (_Configuration.CacheChain && File.Exists(cachePath))
 				{
 					Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Loading chain from cache...");
-					var chain = new ConcurrentChain(_Network.NBitcoinNetwork);
-					chain.Load(File.ReadAllBytes(cachePath), _Network.NBitcoinNetwork, new ConcurrentChain.ChainSerializationFormat()
+					var chain = new ConcurrentChain(_Network.NRealbitNetwork);
+					chain.Load(File.ReadAllBytes(cachePath), _Network.NRealbitNetwork, new ConcurrentChain.ChainSerializationFormat()
 					{
 						SerializeBlockHeader = false,
 						SerializePrecomputedBlockHash = true,
@@ -672,10 +672,10 @@ namespace NBXplorer
 
 		private async Task<bool> WarmupBlockchain()
 		{
-			if (await _OriginalRPC.GetBlockCountAsync() < _Network.NBitcoinNetwork.Consensus.CoinbaseMaturity)
+			if (await _OriginalRPC.GetBlockCountAsync() < _Network.NRealbitNetwork.Consensus.CoinbaseMaturity)
 			{
-				Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Less than {_Network.NBitcoinNetwork.Consensus.CoinbaseMaturity} blocks, mining some block for regtest");
-				await _OriginalRPC.EnsureGenerateAsync(_Network.NBitcoinNetwork.Consensus.CoinbaseMaturity + 1);
+				Logs.Configuration.LogInformation($"{_Network.CryptoCode}: Less than {_Network.NRealbitNetwork.Consensus.CoinbaseMaturity} blocks, mining some block for regtest");
+				await _OriginalRPC.EnsureGenerateAsync(_Network.NRealbitNetwork.Consensus.CoinbaseMaturity + 1);
 				return true;
 			}
 			else
@@ -705,9 +705,9 @@ namespace NBXplorer
 		{
 			if (blockchainInfo.InitialBlockDownload == true)
 				return true;
-			if (blockchainInfo.MedianTime.HasValue && _Network.NBitcoinNetwork.ChainName != ChainName.Regtest)
+			if (blockchainInfo.MedianTime.HasValue && _Network.NRealbitNetwork.ChainName != ChainName.Regtest)
 			{
-				var time = NBitcoin.Utils.UnixTimeToDateTime(blockchainInfo.MedianTime.Value);
+				var time = NRealbit.Utils.UnixTimeToDateTime(blockchainInfo.MedianTime.Value);
 				// 5 month diff? probably synching...
 				if (DateTimeOffset.UtcNow - time > TimeSpan.FromDays(30 * 5))
 				{

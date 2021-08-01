@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions.Internal;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Console.Internal;
 
-namespace NBXplorer.Logging
+namespace NRXplorer.Logging
 {
 	public class CustomConsoleLogProvider : ILoggerProvider
 	{

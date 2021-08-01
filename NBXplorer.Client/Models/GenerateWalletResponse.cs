@@ -1,25 +1,25 @@
-﻿using NBitcoin;
-using NBXplorer.DerivationStrategy;
+﻿using NRealbit;
+using NRXplorer.DerivationStrategy;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NBXplorer.JsonConverters;
+using NRXplorer.JsonConverters;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class GenerateWalletResponse
 	{
 		public string Mnemonic { get; set; }
 		public string Passphrase { get; set; }
-		[JsonConverter(typeof(NBXplorer.JsonConverters.WordlistJsonConverter))]
-		public NBitcoin.Wordlist WordList { get; set; }
-		[JsonConverter(typeof(NBXplorer.JsonConverters.WordcountJsonConverter))]
-		public NBitcoin.WordCount WordCount { get; set; }
-		public BitcoinExtKey MasterHDKey { get; set; }
-		public BitcoinExtKey AccountHDKey { get; set; }
-		[JsonConverter(typeof(NBitcoin.JsonConverters.KeyPathJsonConverter))]
-		public NBitcoin.RootedKeyPath AccountKeyPath { get; set; }
+		[JsonConverter(typeof(NRXplorer.JsonConverters.WordlistJsonConverter))]
+		public NRealbit.Wordlist WordList { get; set; }
+		[JsonConverter(typeof(NRXplorer.JsonConverters.WordcountJsonConverter))]
+		public NRealbit.WordCount WordCount { get; set; }
+		public RealbitExtKey MasterHDKey { get; set; }
+		public RealbitExtKey AccountHDKey { get; set; }
+		[JsonConverter(typeof(NRealbit.JsonConverters.KeyPathJsonConverter))]
+		public NRealbit.RootedKeyPath AccountKeyPath { get; set; }
 		public DerivationStrategyBase DerivationScheme { get; set; }
 
 		public Mnemonic GetMnemonic()

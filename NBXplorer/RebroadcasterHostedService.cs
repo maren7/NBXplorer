@@ -1,18 +1,18 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBitcoin;
-using NBitcoin.RPC;
-using NBXplorer.Configuration;
-using NBXplorer.Events;
-using NBXplorer.Logging;
-using NBXplorer.Models;
+using NRealbit;
+using NRealbit.RPC;
+using NRXplorer.Configuration;
+using NRXplorer.Events;
+using NRXplorer.Logging;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class RebroadcastResult
 	{
@@ -56,7 +56,7 @@ namespace NBXplorer
 		}
 		class RebroadcastedTransactions
 		{
-			public NBXplorerNetwork Network;
+			public NRXplorerNetwork Network;
 			object CollectionLock = new object();
 			Dictionary<TrackedSource, RebroadcastedTransaction> TransactionsHashSet = new Dictionary<TrackedSource, RebroadcastedTransaction>();
 			public void RebroadcastPeriodically(TrackedSource trackedSource, params TrackedTransactionKey[] txIds)
@@ -86,12 +86,12 @@ namespace NBXplorer
 		}
 
 		RepositoryProvider _Repositories;
-		private BitcoinDWaiters _Waiters;
-		Dictionary<NBXplorerNetwork, RebroadcastedTransactions> _BroadcastedTransactionsByCryptoCode;
+		private RealbitDWaiters _Waiters;
+		Dictionary<NRXplorerNetwork, RebroadcastedTransactions> _BroadcastedTransactionsByCryptoCode;
 		public RebroadcasterHostedService(
-			NBXplorerNetworkProvider networkProvider,
+			NRXplorerNetworkProvider networkProvider,
 			ExplorerConfiguration configuration, 
-			RepositoryProvider repositories, BitcoinDWaiters waiters, EventAggregator eventAggregator)
+			RepositoryProvider repositories, RealbitDWaiters waiters, EventAggregator eventAggregator)
 		{
 			_Repositories = repositories;
 			_Waiters = waiters;
@@ -115,14 +115,14 @@ namespace NBXplorer
 			_Loop = RebroadcastLoop(_Cts.Token);
 		}
 
-		public void RebroadcastPeriodically(NBXplorerNetwork network, TrackedSource trackedSource, params TrackedTransactionKey[] txIds)
+		public void RebroadcastPeriodically(NRXplorerNetwork network, TrackedSource trackedSource, params TrackedTransactionKey[] txIds)
 		{
 			if (network == null)
 				throw new ArgumentNullException(nameof(network));
 			_BroadcastedTransactionsByCryptoCode[network].RebroadcastPeriodically(trackedSource, txIds);
 		}
 
-		public async Task RebroadcastPeriodically(NBXplorerNetwork network, TrackedSource trackedSource, params uint256[] txIds)
+		public async Task RebroadcastPeriodically(NRXplorerNetwork network, TrackedSource trackedSource, params uint256[] txIds)
 		{
 			List<TrackedTransactionKey> keys = new List<TrackedTransactionKey>();
 			foreach (var txId in txIds)
@@ -163,7 +163,7 @@ namespace NBXplorer
 			return result;
 		}
 
-		private async Task<RebroadcastResult> Rebroadcast(NBXplorerNetwork network, TrackedSource trackedSource, IEnumerable<TrackedTransactionKey> txIds)
+		private async Task<RebroadcastResult> Rebroadcast(NRXplorerNetwork network, TrackedSource trackedSource, IEnumerable<TrackedTransactionKey> txIds)
 		{
 			var result = new RebroadcastResult();
 			var repository = _Repositories.GetRepository(network);

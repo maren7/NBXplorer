@@ -1,11 +1,11 @@
-﻿using NBitcoin;
-using NBXplorer.Configuration;
+﻿using NRealbit;
+using NRXplorer.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class ChainProvider
 	{
@@ -14,11 +14,11 @@ namespace NBXplorer
 		{
 			foreach(var net in configuration.NetworkProvider.GetAll().Where(n => configuration.Supports(n)))
 			{
-				_Chains.Add(net.CryptoCode, new SlimChain(net.NBitcoinNetwork.GenesisHash));
+				_Chains.Add(net.CryptoCode, new SlimChain(net.NRealbitNetwork.GenesisHash));
 			}
 		}
 
-		public SlimChain GetChain(NBXplorerNetwork network)
+		public SlimChain GetChain(NRXplorerNetwork network)
 		{
 			return GetChain(network.CryptoCode);
 		}

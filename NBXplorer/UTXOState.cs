@@ -1,13 +1,13 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
-using NBitcoin.Crypto;
+using NRealbit.Crypto;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using NBXplorer.Models;
+using NRXplorer.Models;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public enum ApplyTransactionResult
 	{

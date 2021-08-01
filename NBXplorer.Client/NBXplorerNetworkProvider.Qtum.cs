@@ -1,24 +1,24 @@
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitQtum(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Qtum.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Qtum.Instance, networkType)
 			{
 				MinRPCVersion = 140200,
 				CoinType = networkType == ChainName.Mainnet ? new KeyPath("2301'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetQTUM()
+		public NRXplorerNetwork GetQTUM()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Qtum.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Qtum.Instance.CryptoCode);
 		}
 	}
 }

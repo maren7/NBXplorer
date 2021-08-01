@@ -1,4 +1,4 @@
-﻿namespace NBXplorer.Tests
+﻿namespace NRXplorer.Tests
 {
 	public static class RabbitMqTestConfig
 	{
@@ -34,7 +34,7 @@
 		{
 			get
 			{
-				return "newbitcoinblock";
+				return "newrealbitblock";
 			}
 		}
 
@@ -58,7 +58,7 @@
 		{
 			get
 			{
-				return "newbitcointransaction";
+				return "newrealbittransaction";
 			}
 		}
 

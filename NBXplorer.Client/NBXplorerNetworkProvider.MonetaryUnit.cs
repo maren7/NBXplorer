@@ -1,23 +1,23 @@
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-	public partial class NBXplorerNetworkProvider
+	public partial class NRXplorerNetworkProvider
 	{
 		private void InitMonetaryUnit(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.MonetaryUnit.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.MonetaryUnit.Instance, networkType)
 			{
 				MinRPCVersion = 70702
 			});
 		}
 
-		public NBXplorerNetwork GetMUE()
+		public NRXplorerNetwork GetMUE()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.MonetaryUnit.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.MonetaryUnit.Instance.CryptoCode);
 		}
 	}
 }

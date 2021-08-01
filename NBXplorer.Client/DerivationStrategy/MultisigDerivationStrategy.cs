@@ -1,15 +1,15 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using NBitcoin.Crypto;
+using NRealbit.Crypto;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
-namespace NBXplorer.DerivationStrategy
+namespace NRXplorer.DerivationStrategy
 {
 	public class MultisigDerivationStrategy : DerivationStrategyBase
 	{
@@ -25,7 +25,7 @@ namespace NBXplorer.DerivationStrategy
 
 		static readonly Comparer<PubKey> LexicographicComparer = Comparer<PubKey>.Create((a, b) => Comparer<string>.Default.Compare(a?.ToHex(), b?.ToHex()));
 
-		public ReadOnlyCollection<BitcoinExtPubKey> Keys
+		public ReadOnlyCollection<RealbitExtPubKey> Keys
 		{
 			get;
 		}
@@ -50,10 +50,10 @@ namespace NBXplorer.DerivationStrategy
 			}
 		}
 
-		internal MultisigDerivationStrategy(int reqSignature, BitcoinExtPubKey[] keys, bool isLegacy, bool lexicographicOrder,
+		internal MultisigDerivationStrategy(int reqSignature, RealbitExtPubKey[] keys, bool isLegacy, bool lexicographicOrder,
 			ReadOnlyDictionary<string, bool> additionalOptions) : base(additionalOptions)
 		{
-			Keys = new ReadOnlyCollection<BitcoinExtPubKey>(keys);
+			Keys = new ReadOnlyCollection<RealbitExtPubKey>(keys);
 			RequiredSignatures = reqSignature;
 			LexicographicOrder = lexicographicOrder;
 			IsLegacy = isLegacy;

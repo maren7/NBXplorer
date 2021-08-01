@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public interface ILog
 	{

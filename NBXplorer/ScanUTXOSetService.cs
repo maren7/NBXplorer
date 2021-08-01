@@ -7,15 +7,15 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using NBitcoin;
-using NBitcoin.DataEncoders;
-using NBitcoin.RPC;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
-using NBXplorer.Logging;
-using NBitcoin.Scripting;
+using NRealbit;
+using NRealbit.DataEncoders;
+using NRealbit.RPC;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
+using NRXplorer.Logging;
+using NRealbit.Scripting;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	/// <summary>
 	/// Hack, ASP.NET core DI does not support having one singleton for multiple interfaces
@@ -38,7 +38,7 @@ namespace NBXplorer
 	{
 		class ScanUTXOWorkItem
 		{
-			public ScanUTXOWorkItem(NBXplorerNetwork network,
+			public ScanUTXOWorkItem(NRXplorerNetwork network,
 									DerivationStrategyBase derivationStrategy)
 			{
 				Network = network;
@@ -49,7 +49,7 @@ namespace NBXplorer
 			public string Id { get; set; }
 			public DateTimeOffset StartTime { get; set; }
 			public ScanUTXOSetOptions Options { get; set; }
-			public NBXplorerNetwork Network { get; }
+			public NRXplorerNetwork Network { get; }
 			public DerivationSchemeTrackedSource DerivationStrategy { get; set; }
 			public ScanUTXOInformation State { get; set; }
 			public bool Finished { get; internal set; }
@@ -74,7 +74,7 @@ namespace NBXplorer
 		Channel<string> _Channel = Channel.CreateBounded<string>(500);
 		ConcurrentDictionary<string, ScanUTXOWorkItem> _Progress = new ConcurrentDictionary<string, ScanUTXOWorkItem>();
 
-		internal bool EnqueueScan(NBXplorerNetwork network, DerivationStrategyBase derivationScheme, ScanUTXOSetOptions options)
+		internal bool EnqueueScan(NRXplorerNetwork network, DerivationStrategyBase derivationScheme, ScanUTXOSetOptions options)
 		{
 			var workItem = new ScanUTXOWorkItem(network, derivationScheme)
 			{
@@ -134,7 +134,7 @@ namespace NBXplorer
 				{
 					if (!_Progress.TryGetValue(item, out var workItem))
 					{
-						Logs.Explorer.LogError($"{workItem.Network.CryptoCode}: Work has been scheduled for {item}, but the work has not been found in _Progress dictionary. This is likely a bug, contact NBXplorer developers.");
+						Logs.Explorer.LogError($"{workItem.Network.CryptoCode}: Work has been scheduled for {item}, but the work has not been found in _Progress dictionary. This is likely a bug, contact NRXplorer developers.");
 						continue;
 					}
 					Logs.Explorer.LogInformation($"{workItem.Network.CryptoCode}: Start scanning {workItem.DerivationStrategy.ToPrettyString()} from index {workItem.Options.From} with gap limit {workItem.Options.GapLimit}, batch size {workItem.Options.BatchSize}");
@@ -293,7 +293,7 @@ namespace NBXplorer
 			{
 				var trackedTransaction = repo.CreateTrackedTransaction(trackedSource, new TrackedTransactionKey(o.TxId, o.BlockId, true), o.Coins, ToDictionary(o.KeyPathInformations));
 				trackedTransaction.Inserted = now;
-				trackedTransaction.FirstSeen = blockHeadersByBlockId.TryGetValue(o.BlockId, out var header) && header != null ? header.BlockTime : NBitcoin.Utils.UnixTimeToDateTime(0);
+				trackedTransaction.FirstSeen = blockHeadersByBlockId.TryGetValue(o.BlockId, out var header) && header != null ? header.BlockTime : NRealbit.Utils.UnixTimeToDateTime(0);
 				return trackedTransaction;
 			}).ToArray());
 		}
@@ -309,7 +309,7 @@ namespace NBXplorer
 			return result;
 		}
 
-		private ScannedItems GetScannedItems(ScanUTXOWorkItem workItem, ScanUTXOProgress progress, NBXplorerNetwork network)
+		private ScannedItems GetScannedItems(ScanUTXOWorkItem workItem, ScanUTXOProgress progress, NRXplorerNetwork network)
 		{
 			var items = new ScannedItems();
 			var derivationStrategy = workItem.DerivationStrategy;
@@ -323,7 +323,7 @@ namespace NBXplorer
 							  var derivation = lineDerivation.Derive((uint)index);
 							  var info = new KeyPathInformation(derivation, derivationStrategy, feature,
 								  keyPathTemplate.GetKeyPath(index, false), network);
-							  items.Descriptors.Add(OutputDescriptor.NewRaw(info.ScriptPubKey, network.NBitcoinNetwork));
+							  items.Descriptors.Add(OutputDescriptor.NewRaw(info.ScriptPubKey, network.NRealbitNetwork));
 							  items.KeyPathInformations.TryAdd(info.ScriptPubKey, info);
 							  return info;
 						  }).All(_ => true);
@@ -339,7 +339,7 @@ namespace NBXplorer
 			return _Task;
 		}
 
-		public ScanUTXOInformation GetInformation(NBXplorerNetwork network, DerivationStrategyBase derivationScheme)
+		public ScanUTXOInformation GetInformation(NRXplorerNetwork network, DerivationStrategyBase derivationScheme)
 		{
 			_Progress.TryGetValue(new ScanUTXOWorkItem(network, derivationScheme).Id, out var workItem);
 			return workItem?.State;

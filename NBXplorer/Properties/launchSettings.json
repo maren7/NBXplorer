@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "NBXplorer - BTC on Mainnet": {
+    "NRXplorer - BRLB on Mainnet": {
       "commandName": "Project",
       "commandLineArgs": "",
       "launchBrowser": true,
@@ -8,12 +8,12 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:4774",
-      "launchUrl": "v1/cryptos/btc/status"
+      "launchUrl": "v1/cryptos/brlb/status"
     },
 
-    "NBXplorer - BTC+LTC on Regtest": {
+    "NRXplorer - BRLB+LTC on Regtest": {
       "commandName": "Project",
-      "commandLineArgs": "--chains=btc,ltc --network=regtest",
+      "commandLineArgs": "--chains=brlb,ltc --network=regtest",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
@@ -22,28 +22,28 @@
       "applicationUrl": "http://localhost:4774",
       "launchUrl": "v1/cryptos/ltc/status"
     },
-    "NBXplorer - BTC & LBTC on Regtest from Docker": {
+    "NRXplorer - BRLB & LBRLB on Regtest from Docker": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "NBXPLORER_NETWORK": "regtest",
-        "NBXPLORER_CHAINS":"btc,lbtc",
-        "NBXPLORER_LBTCRPCURL": "http://127.0.0.1:19332/",
-        "NBXPLORER_LBTCNODEENDPOINT": "127.0.0.1:19444",
-        "NBXPLORER_LBTCRPCUSER": "liquid",
-        "NBXPLORER_LBTCRPCPASSWORD": "liquid",
-        "NBXPLORER_BTCRPCURL": "http://127.0.0.1:43782/",
-        "NBXPLORER_BTCNODEENDPOINT": "127.0.0.1:39388",
-        "NBXPLORER_BTCRPCUSER": "liquid",
-        "NBXPLORER_BTCRPCPASSWORD": "liquid",
+        "NBXPLORER_CHAINS":"brlb,lbrlb",
+        "NBXPLORER_LBRLBRPCURL": "http://127.0.0.1:19332/",
+        "NBXPLORER_LBRLBNODEENDPOINT": "127.0.0.1:19444",
+        "NBXPLORER_LBRLBRPCUSER": "liquid",
+        "NBXPLORER_LBRLBRPCPASSWORD": "liquid",
+        "NBXPLORER_BRLBRPCURL": "http://127.0.0.1:43782/",
+        "NBXPLORER_BRLBNODEENDPOINT": "127.0.0.1:39388",
+        "NBXPLORER_BRLBRPCUSER": "liquid",
+        "NBXPLORER_BRLBRPCPASSWORD": "liquid",
         "NBXPLORER_NOAUTH": "true",
         "NBXPLORER_EXPOSERPC": "true"
       },
       "applicationUrl": "http://localhost:4774",
-      "launchUrl": "v1/cryptos/lbtc/status"
+      "launchUrl": "v1/cryptos/lbrlb/status"
     },
-    "NBXplorer - DASH on Testnet": {
+    "NRXplorer - DASH on Testnet": {
       "commandName": "Project",
       "commandLineArgs": "--chains=dash --network=testnet",
       "launchBrowser": true,

@@ -1,23 +1,23 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitColossus(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Colossus.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Colossus.Instance, networkType)
 			{
 				MinRPCVersion = 1010000
 			});
 		}
 
-		public NBXplorerNetwork GetCOLX()
+		public NRXplorerNetwork GetCOLX()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Colossus.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Colossus.Instance.CryptoCode);
 		}
 	}
 }

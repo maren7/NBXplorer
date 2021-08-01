@@ -1,9 +1,9 @@
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class CreatePSBTRequest
 	{
@@ -64,10 +64,10 @@ namespace NBXplorer.Models
 		/// <summary>
 		/// Use a specific change address (Optional, default: null, mutually exclusive with ReserveChangeAddress)
 		/// </summary>
-		public BitcoinAddress ExplicitChangeAddress { get; set; }
+		public RealbitAddress ExplicitChangeAddress { get; set; }
 
 		/// <summary>
-		/// Rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NBXplorer knows about)
+		/// Rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NRXplorer knows about)
 		/// This transform (PubKey0, 0/0, accountFingerprint) by (PubKey0, m/49'/0'/0/0, masterFingerprint) 
 		/// </summary>
 		public List<PSBTRebaseKeyRules> RebaseKeyPaths { get; set; }
@@ -93,7 +93,7 @@ namespace NBXplorer.Models
 		/// <summary>
 		/// The account key to rebase
 		/// </summary>
-		public BitcoinExtPubKey AccountKey { get; set; }
+		public RealbitExtPubKey AccountKey { get; set; }
 		/// <summary>
 		/// The path from the root to the account key
 		/// </summary>
@@ -101,7 +101,7 @@ namespace NBXplorer.Models
 	}
 	public class CreatePSBTDestination
 	{
-		public BitcoinAddress Destination { get; set; }
+		public RealbitAddress Destination { get; set; }
 		/// <summary>
 		/// Will Send this amount to this destination (Mutually exclusive with: SweepAll)
 		/// </summary>
@@ -130,7 +130,7 @@ namespace NBXplorer.Models
 		/// </summary>
 		public int? BlockTarget { get; set; }
 		/// <summary>
-		/// If the NBXplorer's node does not have proper fee estimation, this specific rate will be use in Satoshi per vBytes. (Mutually exclusive with: ExplicitFeeRate, ExplicitFee)
+		/// If the NRXplorer's node does not have proper fee estimation, this specific rate will be use in Satoshi per vBytes. (Mutually exclusive with: ExplicitFeeRate, ExplicitFee)
 		/// </summary>
 		public FeeRate FallbackFeeRate { get; set; }
 	}

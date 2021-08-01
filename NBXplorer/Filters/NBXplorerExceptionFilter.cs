@@ -5,21 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using NBXplorer.Models;
+using NRXplorer.Models;
 
-namespace NBXplorer.Filters
+namespace NRXplorer.Filters
 {
-	public class NBXplorerExceptionFilter : IExceptionFilter
+	public class NRXplorerExceptionFilter : IExceptionFilter
 	{
 		public void OnException(ExceptionContext context)
 		{
-			NBXplorerException ex = null;
+			NRXplorerException ex = null;
 			var formatEx = context.Exception as FormatException;
 			if(formatEx != null)
 			{
-				ex = new NBXplorerError(400, "invalid-format", formatEx.Message).AsException();
+				ex = new NRXplorerError(400, "invalid-format", formatEx.Message).AsException();
 			}
-			ex = ex ?? context.Exception as NBXplorerException;
+			ex = ex ?? context.Exception as NRXplorerException;
 			if(ex != null)
 			{
 				context.Exception = null;

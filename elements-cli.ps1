@@ -1,1 +1,1 @@
-docker exec -ti btcpayserver_elementsd_liquid elements-cli -rpcuser=liquid -rpcpassword=liquid -rpcport=19332 $args
+docker exec -ti brlbpayserver_elementsd_liquid elements-cli -rpcuser=liquid -rpcpassword=liquid -rpcport=19332 $args

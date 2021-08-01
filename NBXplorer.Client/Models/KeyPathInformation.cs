@@ -1,11 +1,11 @@
-﻿using NBitcoin;
-using NBXplorer.DerivationStrategy;
+﻿using NRealbit;
+using NRXplorer.DerivationStrategy;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class KeyPathInformation
 	{
@@ -14,7 +14,7 @@ namespace NBXplorer.Models
 
 		}
 		
-		public KeyPathInformation(Derivation derivation, DerivationSchemeTrackedSource derivationStrategy, DerivationFeature feature, KeyPath keyPath, NBXplorerNetwork network)
+		public KeyPathInformation(Derivation derivation, DerivationSchemeTrackedSource derivationStrategy, DerivationFeature feature, KeyPath keyPath, NRXplorerNetwork network)
 		{
 			ScriptPubKey = derivation.ScriptPubKey;
 			Redeem = derivation.Redeem;
@@ -45,7 +45,7 @@ namespace NBXplorer.Models
 			get; set;
 		}
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-		public BitcoinAddress Address { get; set; }
+		public RealbitAddress Address { get; set; }
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public Script Redeem
 		{

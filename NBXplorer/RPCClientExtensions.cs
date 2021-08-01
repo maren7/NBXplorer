@@ -1,16 +1,16 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Newtonsoft.Json.Linq;
-using NBitcoin.RPC;
+using NRealbit.RPC;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NBXplorer.Models;
-using NBitcoin.DataEncoders;
+using NRXplorer.Models;
+using NRealbit.DataEncoders;
 using System.Threading;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class GetBlockchainInfoResponse
 	{
@@ -113,7 +113,7 @@ namespace NBXplorer
 				DateTimeOffset timestamp = DateTimeOffset.UtcNow;
 				if (rpcResult["time"] != null)
 				{
-					timestamp = NBitcoin.Utils.UnixTimeToDateTime(rpcResult.Value<long>("time"));
+					timestamp = NRealbit.Utils.UnixTimeToDateTime(rpcResult.Value<long>("time"));
 				}
 				
 				var rawTx = client.Network.Consensus.ConsensusFactory.CreateTransaction();

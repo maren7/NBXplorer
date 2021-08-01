@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NBitcoin;
+using NRealbit;
 using System.Reflection;
 using System;
 using System.Threading.Tasks;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 
-namespace NBXplorer.ModelBinders
+namespace NRXplorer.ModelBinders
 {
 	public class NetworkModelBinder : IModelBinder
 	{
@@ -19,7 +19,7 @@ namespace NBXplorer.ModelBinders
 		public Task BindModelAsync(ModelBindingContext bindingContext)
 		{
 			if(!typeof(Network).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType) &&
-			   !typeof(NBXplorerNetwork).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType))
+			   !typeof(NRXplorerNetwork).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType))
 			{
 				return Task.CompletedTask;
 			}
@@ -37,7 +37,7 @@ namespace NBXplorer.ModelBinders
 				return Task.CompletedTask;
 			}
 
-			var networkProvider = (NBXplorer.NBXplorerNetworkProvider)bindingContext.HttpContext.RequestServices.GetService(typeof(NBXplorer.NBXplorerNetworkProvider));
+			var networkProvider = (NRXplorer.NRXplorerNetworkProvider)bindingContext.HttpContext.RequestServices.GetService(typeof(NRXplorer.NRXplorerNetworkProvider));
 			var cryptoCode = bindingContext.ValueProvider.GetValue("cryptoCode").FirstValue;
 			if (string.IsNullOrEmpty(cryptoCode))
 			{
@@ -45,13 +45,13 @@ namespace NBXplorer.ModelBinders
 			}
 			if (string.IsNullOrEmpty(cryptoCode))
 			{
-				cryptoCode = "BTC";
+				cryptoCode = "BRLB";
 			}
 			var network = networkProvider.GetFromCryptoCode(cryptoCode);
 			if (network == null)
 				throw new FormatException($"The cryptoCode '{cryptoCode}' is not supported");
 			if (typeof(Network).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType))
-				bindingContext.Result = ModelBindingResult.Success(network.NBitcoinNetwork);
+				bindingContext.Result = ModelBindingResult.Success(network.NRealbitNetwork);
 			else
 				bindingContext.Result = ModelBindingResult.Success(network);
 			return Task.CompletedTask;

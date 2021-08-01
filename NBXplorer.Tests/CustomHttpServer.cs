@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using System.Net;
 using System.Net.Sockets;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public class CustomServer : IDisposable
 	{

@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Primitives;
 
-namespace NBXplorer.Configuration
+namespace NRXplorer.Configuration
 {
     public static class ConfigurationExtensions
     {

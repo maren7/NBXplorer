@@ -1,22 +1,22 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
-using NBXplorer.Models;
-using NBitcoin.JsonConverters;
+using NRXplorer.Models;
+using NRealbit.JsonConverters;
 
-namespace NBXplorer.JsonConverters
+namespace NRXplorer.JsonConverters
 {
 	public class TrackedSourceJsonConverter : JsonConverter
 	{
-		public TrackedSourceJsonConverter(NBXplorerNetwork network)
+		public TrackedSourceJsonConverter(NRXplorerNetwork network)
 		{
 			Network = network;
 		}
 
-		public NBXplorerNetwork Network { get; }
+		public NRXplorerNetwork Network { get; }
 
 		public override bool CanConvert(Type objectType)
 		{

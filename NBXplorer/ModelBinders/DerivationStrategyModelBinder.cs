@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NBitcoin;
+using NRealbit;
 using System.Reflection;
 using System;
 using System.Threading.Tasks;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 
-namespace NBXplorer.ModelBinders
+namespace NRXplorer.ModelBinders
 {
 	public class DerivationStrategyModelBinder : IModelBinder
 	{
@@ -36,10 +36,10 @@ namespace NBXplorer.ModelBinders
 				return Task.CompletedTask;
 			}
 
-			var networkProvider = (NBXplorer.NBXplorerNetworkProvider)bindingContext.HttpContext.RequestServices.GetService(typeof(NBXplorer.NBXplorerNetworkProvider));
+			var networkProvider = (NRXplorer.NRXplorerNetworkProvider)bindingContext.HttpContext.RequestServices.GetService(typeof(NRXplorer.NRXplorerNetworkProvider));
 			var cryptoCode = bindingContext.ValueProvider.GetValue("cryptoCode").FirstValue;
 			cryptoCode = cryptoCode ?? bindingContext.ValueProvider.GetValue("network").FirstValue;
-			var network = networkProvider.GetFromCryptoCode((cryptoCode ?? "BTC"));
+			var network = networkProvider.GetFromCryptoCode((cryptoCode ?? "BRLB"));
 			try
 			{
 				var data = network.DerivationStrategyFactory.Parse(key);

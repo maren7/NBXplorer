@@ -1,5 +1,5 @@
-﻿using NBitcoin;
-using NBitcoin.RPC;
+﻿using NRealbit;
+using NRealbit.RPC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
     public static class ExtensionsClient
     {

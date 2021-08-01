@@ -1,11 +1,11 @@
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 using System.Linq;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public enum ScanUTXOStatus
 	{

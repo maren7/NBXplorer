@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NBitcoin;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Logging;
-using NBXplorer.ModelBinders;
-using NBXplorer.Models;
+using NRealbit;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Logging;
+using NRXplorer.ModelBinders;
+using NRXplorer.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -12,10 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NBitcoin.RPC;
-using NBXplorer.Analytics;
+using NRealbit.RPC;
+using NRXplorer.Analytics;
 
-namespace NBXplorer.Controllers
+namespace NRXplorer.Controllers
 {
 	public partial class MainController
 	{
@@ -23,7 +23,7 @@ namespace NBXplorer.Controllers
 		[Route("cryptos/{network}/derivations/{strategy}/psbt/create")]
 		public async Task<IActionResult> CreatePSBT(
 			[ModelBinder(BinderType = typeof(NetworkModelBinder))]
-			NBXplorerNetwork network,
+			NRXplorerNetwork network,
 			[ModelBinder(BinderType = typeof(DerivationStrategyModelBinder))]
 			DerivationStrategyBase strategy,
 			[FromBody]
@@ -36,8 +36,8 @@ namespace NBXplorer.Controllers
 				throw new ArgumentNullException(nameof(strategy));
 
 			var repo = RepositoryProvider.GetRepository(network);
-			var txBuilder = request.Seed is int s ? network.NBitcoinNetwork.CreateTransactionBuilder(s)
-												: network.NBitcoinNetwork.CreateTransactionBuilder();
+			var txBuilder = request.Seed is int s ? network.NRealbitNetwork.CreateTransactionBuilder(s)
+												: network.NRealbitNetwork.CreateTransactionBuilder();
 
 			CreatePSBTSuggestions suggestions = null;
 			if (!(request.DisableFingerprintRandomization is true) &&
@@ -131,7 +131,7 @@ namespace NBXplorer.Controllers
 			// nLockTime that preclude a fix later.
 			else if (!(request.DiscourageFeeSniping is false))
 			{
-				if (waiter.State is BitcoinDWaiterState.Ready)
+				if (waiter.State is RealbitDWaiterState.Ready)
 				{
 					int blockHeight = ChainProvider.GetChain(network).Height;
 					// Secondly occasionally randomly pick a nLockTime even further back, so
@@ -197,7 +197,7 @@ namespace NBXplorer.Controllers
 					}
 					catch
 					{
-						throw new NBXplorerException(new NBXplorerError(400, "not-enough-funds", "You can't sweep funds, because you don't have any."));
+						throw new NRXplorerException(new NRXplorerError(400, "not-enough-funds", "You can't sweep funds, because you don't have any."));
 					}
 				}
 				else
@@ -211,7 +211,7 @@ namespace NBXplorer.Controllers
 						}
 						catch
 						{
-							throw new NBXplorerException(new NBXplorerError(400, "not-enough-funds", "You can't substract fee on this destination, because not enough money was sent to it"));
+							throw new NRXplorerException(new NRXplorerError(400, "not-enough-funds", "You can't substract fee on this destination, because not enough money was sent to it"));
 						}
 					}
 				}
@@ -249,7 +249,7 @@ namespace NBXplorer.Controllers
 						var rate = await GetFeeRate(blockTarget, network.CryptoCode);
 						txBuilder.SendEstimatedFees(rate.FeeRate);
 					}
-					catch (NBXplorerException e) when (e.Error.Code == "fee-estimation-unavailable" && request.FeePreference?.FallbackFeeRate is FeeRate fallbackFeeRate)
+					catch (NRXplorerException e) when (e.Error.Code == "fee-estimation-unavailable" && request.FeePreference?.FallbackFeeRate is FeeRate fallbackFeeRate)
 					{
 						txBuilder.SendEstimatedFees(fallbackFeeRate);
 					}
@@ -265,7 +265,7 @@ namespace NBXplorer.Controllers
 						var rate = await GetFeeRate(1, network.CryptoCode);
 						txBuilder.SendEstimatedFees(rate.FeeRate);
 					}
-					catch (NBXplorerException e) when (e.Error.Code == "fee-estimation-unavailable" && request.FeePreference?.FallbackFeeRate is FeeRate fallbackFeeRate)
+					catch (NRXplorerException e) when (e.Error.Code == "fee-estimation-unavailable" && request.FeePreference?.FallbackFeeRate is FeeRate fallbackFeeRate)
 					{
 						txBuilder.SendEstimatedFees(fallbackFeeRate);
 					}
@@ -275,7 +275,7 @@ namespace NBXplorer.Controllers
 			}
 			catch (NotEnoughFundsException)
 			{
-				throw new NBXplorerException(new NBXplorerError(400, "not-enough-funds", "Not enough funds for doing this transaction"));
+				throw new NRXplorerException(new NRXplorerError(400, "not-enough-funds", "Not enough funds for doing this transaction"));
 			}
 			// We made sure we can build the PSBT, so now we can reserve the change address if we need to
 			if (hasChange && request.ExplicitChangeAddress == null && request.ReserveChangeAddress)
@@ -304,11 +304,11 @@ namespace NBXplorer.Controllers
 				AlwaysIncludeNonWitnessUTXO = request.AlwaysIncludeNonWitnessUTXO,
 				IncludeGlobalXPub = request.IncludeGlobalXPub
 			};
-			await UpdatePSBTCore(update, network);
+			await UpdatePSBRLBore(update, network);
 			var resp = new CreatePSBTResponse()
 			{
 				PSBT = update.PSBT,
-				ChangeAddress = hasChange ? change.ScriptPubKey.GetDestinationAddress(network.NBitcoinNetwork) : null,
+				ChangeAddress = hasChange ? change.ScriptPubKey.GetDestinationAddress(network.NRealbitNetwork) : null,
 				Suggestions = suggestions
 			};
 			return Json(resp, network.JsonSerializerSettings);
@@ -318,18 +318,18 @@ namespace NBXplorer.Controllers
 		[Route("cryptos/{network}/psbt/update")]
 		public async Task<IActionResult> UpdatePSBT(
 			[ModelBinder(BinderType = typeof(NetworkModelBinder))]
-			NBXplorerNetwork network,
+			NRXplorerNetwork network,
 			[FromBody]
 			JObject body)
 		{
 			var update = ParseJObject<UpdatePSBTRequest>(body, network);
 			if (update.PSBT == null)
-				throw new NBXplorerException(new NBXplorerError(400, "missing-parameter", "'psbt' is missing"));
-			await UpdatePSBTCore(update, network);
+				throw new NRXplorerException(new NRXplorerError(400, "missing-parameter", "'psbt' is missing"));
+			await UpdatePSBRLBore(update, network);
 			return Json(new UpdatePSBTResponse() { PSBT = update.PSBT }, network.JsonSerializerSettings);
 		}
 
-		private async Task UpdatePSBTCore(UpdatePSBTRequest update, NBXplorerNetwork network)
+		private async Task UpdatePSBRLBore(UpdatePSBTRequest update, NRXplorerNetwork network)
 		{
 			var repo = RepositoryProvider.GetRepository(network);
 			var rpc = Waiters.GetWaiter(network);
@@ -338,7 +338,7 @@ namespace NBXplorer.Controllers
 			{
 				if (update.IncludeGlobalXPub is true)
 				{
-					foreach (var extpub in derivationScheme.GetExtPubKeys().Select(e => e.GetWif(network.NBitcoinNetwork)))
+					foreach (var extpub in derivationScheme.GetExtPubKeys().Select(e => e.GetWif(network.NRealbitNetwork)))
 					{
 						update.PSBT.GlobalXPubs.AddOrReplace(extpub, new RootedKeyPath(extpub, new KeyPath()));
 					}
@@ -356,11 +356,11 @@ namespace NBXplorer.Controllers
 			if (update.RebaseKeyPaths != null)
 			{
 				if (update.RebaseKeyPaths.Any(r => r.AccountKey is null))
-					throw new NBXplorerException(new NBXplorerError(400, "missing-parameter", "rebaseKeyPaths[].accountKey is missing"));
+					throw new NRXplorerException(new NRXplorerError(400, "missing-parameter", "rebaseKeyPaths[].accountKey is missing"));
 				foreach (var rebase in update.RebaseKeyPaths.Where(r => rebased.Add(r.AccountKey.GetPublicKey())))
 				{
 					if (rebase.AccountKeyPath == null)
-						throw new NBXplorerException(new NBXplorerError(400, "missing-parameter", "rebaseKeyPaths[].accountKeyPath is missing"));
+						throw new NRXplorerException(new NRXplorerError(400, "missing-parameter", "rebaseKeyPaths[].accountKeyPath is missing"));
 					update.PSBT.RebaseKeyPaths(rebase.AccountKey, rebase.AccountKeyPath);
 				}
 			}
@@ -384,7 +384,7 @@ namespace NBXplorer.Controllers
 			var strategy = update.DerivationScheme;
 			var pubkeys = strategy.GetExtPubKeys().Select(p => p.AsHDKeyCache()).ToArray();
 			var keyInfosByScriptPubKey = new Dictionary<Script, KeyPathInformation>();
-			var scriptPubKeys = update.PSBT.Outputs.OfType<PSBTCoin>().Concat(update.PSBT.Inputs)
+			var scriptPubKeys = update.PSBT.Outputs.OfType<PSBRLBoin>().Concat(update.PSBT.Inputs)
 											.Where(o => !o.HDKeyPaths.Any())
 											.Select(o => o.GetCoin()?.ScriptPubKey)
 											.Where(s => s != null).ToArray();
@@ -406,7 +406,7 @@ namespace NBXplorer.Controllers
 			}
 
 			List<Script> redeems = new List<Script>();
-			foreach (var c in update.PSBT.Outputs.OfType<PSBTCoin>().Concat(update.PSBT.Inputs.Where(o => !o.IsFinalized())))
+			foreach (var c in update.PSBT.Outputs.OfType<PSBRLBoin>().Concat(update.PSBT.Inputs.Where(o => !o.IsFinalized())))
 			{
 				var script = c.GetCoin()?.ScriptPubKey;
 				if (script != null &&
@@ -415,7 +415,7 @@ namespace NBXplorer.Controllers
 					foreach (var pubkey in pubkeys)
 					{
 						var childPubKey = pubkey.Derive(keyInfo.KeyPath);
-						NBitcoin.Extensions.AddOrReplace(c.HDKeyPaths, childPubKey.GetPublicKey(), new RootedKeyPath(fps[pubkey.GetPublicKey()], keyInfo.KeyPath));
+						NRealbit.Extensions.AddOrReplace(c.HDKeyPaths, childPubKey.GetPublicKey(), new RootedKeyPath(fps[pubkey.GetPublicKey()], keyInfo.KeyPath));
 						if (keyInfo.Redeem != null && c.RedeemScript is null && c.WitnessScript is null)
 							redeems.Add(keyInfo.Redeem);
 					}
@@ -438,7 +438,7 @@ namespace NBXplorer.Controllers
 				return input.WitnessUtxo == null && input.NonWitnessUtxo == null;
 		}
 
-		private async Task UpdateUTXO(UpdatePSBTRequest update, Repository repo, BitcoinDWaiter rpc)
+		private async Task UpdateUTXO(UpdatePSBTRequest update, Repository repo, RealbitDWaiter rpc)
 		{
 			if (rpc?.RPCAvailable is true)
 			{
@@ -513,7 +513,7 @@ namespace NBXplorer.Controllers
 			}
 		}
 
-		private T ParseJObject<T>(JObject requestObj, NBXplorerNetwork network)
+		private T ParseJObject<T>(JObject requestObj, NRXplorerNetwork network)
 		{
 			if (requestObj == null)
 				return default;

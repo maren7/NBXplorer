@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin;
-using NBXplorer.DerivationStrategy;
+using NRealbit;
+using NRXplorer.DerivationStrategy;
 using Newtonsoft.Json;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class NewTransactionEvent : NewEventBase
 	{

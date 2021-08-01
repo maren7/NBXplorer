@@ -1,8 +1,8 @@
 ﻿# API Specification
 
-NBXplorer is a multi crypto currency lightweight block explorer.
+NRXplorer is a multi crypto currency lightweight block explorer.
 
-NBXplorer does not index the whole blockchain, rather, it listens transactions and blocks from a trusted full node and index only addresses and transactions which belongs to a `DerivationScheme` that you decide to track.
+NRXplorer does not index the whole blockchain, rather, it listens transactions and blocks from a trusted full node and index only addresses and transactions which belongs to a `DerivationScheme` that you decide to track.
 
 ## Table of content
 
@@ -28,8 +28,8 @@ NBXplorer does not index the whole blockchain, rather, it listens transactions a
 * [Scan UTXO Set](#scanUtxoSet)
 * [Query event stream](#eventStream)
 * [Query event stream from most recent](#eventStreamLatest)
-* [Create Partially Signed Bitcoin Transaction](#psbt)
-* [Update Partially Signed Bitcoin Transaction](#updatepsbt)
+* [Create Partially Signed Realbit Transaction](#psbt)
+* [Update Partially Signed Realbit Transaction](#updatepsbt)
 * [Attach metadata to a derivation scheme](#metadata)
 * [Detach metadata from a derivation scheme](#detachmetadata)
 * [Retrieve metadata from a derivation scheme](#getmetadata)
@@ -43,14 +43,14 @@ NBXplorer does not index the whole blockchain, rather, it listens transactions a
 
 You can check the available settings with `--help`.
 
-NBXplorer can be configured in three way:
-* Through command line arguments (eg. `--chains btc`)
-* Through environment variables (eg. `NBXPLORER_CHAINS=btc`)
-* Through configuration file (eg. `chains=btc`)
+NRXplorer can be configured in three way:
+* Through command line arguments (eg. `--chains brlb`)
+* Through environment variables (eg. `NBXPLORER_CHAINS=brlb`)
+* Through configuration file (eg. `chains=brlb`)
 
 If you use configuration file, you can find it on windows in:
 ```
-C:\Users\<user>\AppData\Roaming\NBXplorer\<network>\settings.config
+C:\Users\<user>\AppData\Roaming\NRXplorer\<network>\settings.config
 ```
 
 On linux or mac:
@@ -58,18 +58,18 @@ On linux or mac:
 ~/.nbxplorer/<network>/settings.config
 ```
 
-Be careful, if you run NBXplorer with `dotnet run`, you should do it this way, with settings after the `--`:
+Be careful, if you run NRXplorer with `dotnet run`, you should do it this way, with settings after the `--`:
 ```bash
-dotnet run --no-launch-profile --no-build -c Release -p .\NBXplorer\NBXplorer.csproj -- --chains btc
+dotnet run --no-launch-profile --no-build -c Release -p .\NRXplorer\NRXplorer.csproj -- --chains brlb
 ```
 
 Else, launch profiles, which are settings meant to be used only for debugging time, might be taken into account.
 
 ## <a name="auth"></a>Authentication
 
-By default a cookie file is generated when NBXplorer is starting, for windows in:
+By default a cookie file is generated when NRXplorer is starting, for windows in:
 ```
-C:\Users\<user>\AppData\Roaming\NBXplorer\<network>\.cookie
+C:\Users\<user>\AppData\Roaming\NRXplorer\<network>\.cookie
 ```
 
 On linux or mac:
@@ -86,7 +86,7 @@ Also, NBXPlorer listen by default on `127.0.0.1`, if you want to access it from 
 ## <a name="derivationScheme"></a>Derivation Scheme Format
 
 A derivation scheme, also called derivationStrategy in the code, is a flexible way to define how to generate address of a wallet.
-NBXplorer will track any addresses on the `0/x`, `1/x` and `x` path.
+NRXplorer will track any addresses on the `0/x`, `1/x` and `x` path.
 
 Here a documentation of the different derivation scheme supported:
 
@@ -103,11 +103,11 @@ For multisig, the public keys are ordered before generating the address by defau
 
 You can use more than one options at same time, example: `2-of-xpub1-xpub2-[legacy]-[keeporder]`
 
-Most of routes asks for a `cryptoCode`. This identify the crypto currency to request data from. (eg. `BTC`, `LTC`...)
+Most of routes asks for a `cryptoCode`. This identify the crypto currency to request data from. (eg. `BRLB`, `LTC`...)
 
 ## <a name="track"></a>Track a derivation scheme
 
-After this call, the specified `derivation scheme` will be tracked by NBXplorer
+After this call, the specified `derivation scheme` will be tracked by NRXplorer
 
 HTTP POST v1/cryptos/{cryptoCode}/derivations/{derivationScheme}
 
@@ -134,7 +134,7 @@ Optionally, you can attach a json body:
 
 ## <a name="address"></a>Track a specific address
 
-After this call, the specified address will be tracked by NBXplorer
+After this call, the specified address will be tracked by NRXplorer
 
 HTTP POST v1/cryptos/{cryptoCode}/addresses/{address}
 
@@ -405,7 +405,7 @@ HTTP GET v1/cryptos/{cryptoCode}/status
 Returns:
 ```json
 {
-  "bitcoinStatus": {
+  "realbitStatus": {
     "blocks": 103,
     "headers": 103,
     "verificationProgress": 1.0,
@@ -423,10 +423,10 @@ Returns:
   "chainHeight": 103,
   "syncHeight": 103,
   "networkType": "Regtest",
-  "cryptoCode": "BTC",
+  "cryptoCode": "BRLB",
   "instanceName": "MyInstance",
   "supportedCryptoCodes": [
-    "BTC"
+    "BRLB"
   ],
   "version": "1.0.3.5"
 }
@@ -605,7 +605,7 @@ This call does not returns conflicted unconfirmed UTXOs.
 
 ## <a name="websocket"></a>Notifications via websocket
 
-NBXplorer implements real-time notification via websocket supports for new block or transaction.
+NRXplorer implements real-time notification via websocket supports for new block or transaction.
 
 HTTP GET v1/cryptos/{cryptoCode}/connect
 
@@ -615,7 +615,7 @@ Once you are connected to the websocket, you can subscribe to block notification
 {
   "type": "subscribeblock",
   "data": {
-    "cryptoCode": "BTC"
+    "cryptoCode": "BRLB"
   }
 }
 ```
@@ -629,7 +629,7 @@ Then a notification will be delivered through the websocket when a new block is 
     "height": 104,
     "hash": "10b0e5178aaf42c4a938f0d37430413b7d76feae14b01fc07e1f23300b8821ce",
     "previousBlockHash": "4c6a9c1cadf143c87249519639e86e236feac9d3cea2904e4c42bc5bc32a48a7",
-    "cryptoCode": "BTC"
+    "cryptoCode": "BRLB"
   }
 }
 ```
@@ -640,7 +640,7 @@ For notification concerning `Derivation Scheme` transactions, you can subscribe 
 {
   "type": "subscribetransaction",
   "data": {
-    "cryptoCode": "BTC",
+    "cryptoCode": "BRLB",
     "derivationSchemes": [
       "tpubD6NzVbkrYhZ4YL91Ez5fdgaBPQbFhedFdn5gQL4tSCJn1usmHsV1L6VokzLbgcqzh9hiBnfnQANp5BYW15QdFGRKspZVSW1v2QY917RDs1V-[legacy]"
     ]
@@ -674,18 +674,18 @@ Then you will receive such notifications when a transaction is impacting the `de
         "value": 100000000
       }
     ],
-    "cryptoCode": "BTC"
+    "cryptoCode": "BRLB"
   }
 }
 ```
 
-If you want all transactions of all derivation schemes of BTC, send this to the WebSocket:
+If you want all transactions of all derivation schemes of BRLB, send this to the WebSocket:
 
 ```
 {
   "type": "subscribetransaction",
   "data": {
-    "cryptoCode": "BTC"
+    "cryptoCode": "BRLB"
   }
 }
 ```
@@ -733,10 +733,10 @@ Returns:
 
 ## <a name="rescan"></a>Rescan a transaction
 
-NBXplorer does not rescan the whole blockchain when tracking a new derivation scheme.
-This means that if the derivation scheme already received UTXOs in the past, NBXplorer will not be aware of it and might reuse addresses already generated in the past, and will not show past transactions.
+NRXplorer does not rescan the whole blockchain when tracking a new derivation scheme.
+This means that if the derivation scheme already received UTXOs in the past, NRXplorer will not be aware of it and might reuse addresses already generated in the past, and will not show past transactions.
 
-By using this route, you can ask NBXplorer to rescan specific transactions found in the blockchain.
+By using this route, you can ask NRXplorer to rescan specific transactions found in the blockchain.
 This way, the transactions and the UTXOs present before tracking the derivation scheme will appear correctly.
 
 HTTP POST v1/cryptos/{cryptoCode}/rescan
@@ -797,11 +797,11 @@ The fee rate is in satoshi/byte.
 
 ## <a name="scanUtxoSet"></a>Scan UTXO Set
 
-NBXplorer can scan the UTXO Set for output belonging to your derivationScheme.
+NRXplorer can scan the UTXO Set for output belonging to your derivationScheme.
 
-HTTP POST v1/cryptos/BTC/derivations/{derivationScheme}/utxos/scan
+HTTP POST v1/cryptos/BRLB/derivations/{derivationScheme}/utxos/scan
 
-In order to not consume too much RAM, NBXplorer splits the addresses to scan in several `batch` and scan the whole UTXO set sequentially.
+In order to not consume too much RAM, NRXplorer splits the addresses to scan in several `batch` and scan the whole UTXO set sequentially.
 Three branches are scanned: 0/x, 1/x and x.
 
 If a UTXO in one branch get found at a specific x, then all addresses inferior to index x will be considered used and not proposed when fetching a new unused address.
@@ -887,7 +887,7 @@ The smallest `eventId` is 1.
       "height": 104,
       "hash": "1f31c605c0a5d54b65fa39dc8cb4db025be63c66280279ade9338571a9e63d35",
       "previousBlockHash": "7639350b31f3ce07ff976ebae772fef1602b30a10ccb8ca69047fe0fe8b9083c",
-      "cryptoCode": "BTC",
+      "cryptoCode": "BRLB",
     }
   },
   {
@@ -913,7 +913,7 @@ The smallest `eventId` is 1.
           "value": 100000000
         }
       ],
-      "cryptoCode": "BTC",
+      "cryptoCode": "BRLB",
     }
   }
 ]
@@ -929,9 +929,9 @@ Query parameters:
 
 * `limit`: Limit the maximum number of events to return (default: 10)
 
-## <a name="psbt"></a>Create Partially Signed Bitcoin Transaction
+## <a name="psbt"></a>Create Partially Signed Realbit Transaction
 
-Create a [Partially Signed Bitcoin Transaction](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) (PSBT).
+Create a [Partially Signed Realbit Transaction](https://github.com/realbit/bips/blob/master/bip-0174.mediawiki) (PSBT).
 
 A PSBT is a standard format to represent a transaction with pending signatures associated to it.
 A PSBT can be signed independently by many signers, and combined together before broadcast.
@@ -1006,9 +1006,9 @@ Fields:
 * `feePreference.explicitFeeRate`: An explicit fee rate for the transaction in Satoshi per vBytes (Mutually exclusive with: blockTarget, explicitFee, fallbackFeeRate)
 * `feePreference.explicitFee`: An explicit fee for the transaction in Satoshi (Mutually exclusive with: blockTarget, explicitFeeRate, fallbackFeeRate)
 * `feePreference.blockTarget`: A number of blocks after which the user expect one confirmation (Mutually exclusive with: explicitFeeRate, explicitFee)
-* `feePreference.fallbackFeeRate`: If the NBXplorer's node does not have proper fee estimation, this specific rate will be use in Satoshi per vBytes, this make sure that `fee-estimation-unavailable` is never sent. (Mutually exclusive with: explicitFeeRate, explicitFee)
+* `feePreference.fallbackFeeRate`: If the NRXplorer's node does not have proper fee estimation, this specific rate will be use in Satoshi per vBytes, this make sure that `fee-estimation-unavailable` is never sent. (Mutually exclusive with: explicitFeeRate, explicitFee)
 * `discourageFeeSniping`: If `timeLock` is not set, set the timeLock to a random value to discourage fee sniping (default to `true`, if `disableFingerprintRandomization` is `true`)
-* `rebaseKeyPaths`: Optional. rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NBXplorer knows about), a rebase can transform (PubKey0, 0/0, accountFingerprint) by (PubKey0, m/49'/0'/0/0, masterFingerprint)
+* `rebaseKeyPaths`: Optional. rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NRXplorer knows about), a rebase can transform (PubKey0, 0/0, accountFingerprint) by (PubKey0, m/49'/0'/0/0, masterFingerprint)
 * `rebaseKeyPaths[].accountKey`: The account key to rebase
 * `rebaseKeyPaths[].accountKeyPath`: The path from the root to the account key prefixed by the master public key fingerprint.
 * `disableFingerprintRandomization`: Disable the randomization of default parameter's value to match the network's fingerprint distribution. (randomized default values are `version`, `timeLock`, `rbf`, `discourageFeeSniping`)
@@ -1027,18 +1027,18 @@ Response:
 }
 ```
 
-* `psbt`: The partially signed bitcoin transaction in Base64.
+* `psbt`: The partially signed realbit transaction in Base64.
 * `changeAddress`: The change address of the transaction, useful for tests (can be null)
 * `suggestions`: Suggestions to the signer of the PSBT (null value if `disableFingerprintRandomization` is set to `false`)
 * `suggestions.shouldEnforceLowR`: If `true`, the signer should enforce the creation of 71 bytes ECDSA signature to maximize privacy.
 
 Note, in the example above, if the [metadata](#metadata) `AccountKeyPath` is set to `ab5ed9ab/49'/0'/0'`, then you don't have to pass `rebaseKeyPaths`.
 
-## <a name="updatepsbt"></a>Update Partially Signed Bitcoin Transaction
+## <a name="updatepsbt"></a>Update Partially Signed Realbit Transaction
 
 HTTP POST v1/cryptos/{cryptoCode}/psbt/update
 
-NBXplorer will take to complete as much information as it can about this PSBT.
+NRXplorer will take to complete as much information as it can about this PSBT.
 
 ```json
 {
@@ -1056,7 +1056,7 @@ NBXplorer will take to complete as much information as it can about this PSBT.
 * `psbt`: Required. A potentially incomplete PSBT that you want to update (Input WitnessUTXO, NonWitnessUTXO)
 * `derivationScheme`: Optional. If specified, will complete HDKeyPaths, witness script and redeem script information in the PSBT belonging to this derivationScheme.
 * `includeGlobalXPub`: Optional. Whether or not to include the global xpubs of the derivation scheme in the PSBT. (default: false)
-* `rebaseKeyPaths`: Optional. Rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NBXplorer knows about), a rebase can transform (PubKey0, 0/0, accountFingerprint) by (PubKey0, m/49'/0'/0/0, masterFingerprint)
+* `rebaseKeyPaths`: Optional. Rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NRXplorer knows about), a rebase can transform (PubKey0, 0/0, accountFingerprint) by (PubKey0, m/49'/0'/0/0, masterFingerprint)
 * `rebaseKeyPaths[].accountKey`: The account key to rebase
 * `rebaseKeyPaths[].accountKeyPath`: The path from the root to the account key prefixed by the master public key fingerprint.
 * `alwaysIncludeNonWitnessUTXO`: Try to set the full transaction in `non_witness_utxo`, even for segwit inputs (default to `false`)
@@ -1113,7 +1113,7 @@ Body:
 
 ## <a name="pruning"></a>Manual pruning
 
-NBXplorer has an auto pruning feature configurable with `--autopruning x` where `x` is in second. If a call to NBXplorer's `Get utxo` or `Get PSBT`  takes more time than `x seconds`, then the auto pruning will delete transactions whose all UTXOs have been already spent and which are old enough.
+NRXplorer has an auto pruning feature configurable with `--autopruning x` where `x` is in second. If a call to NRXplorer's `Get utxo` or `Get PSBT`  takes more time than `x seconds`, then the auto pruning will delete transactions whose all UTXOs have been already spent and which are old enough.
 
 You can however force pruning by calling:
 
@@ -1139,7 +1139,7 @@ Response:
 
 ## <a name="wallet"></a>Generate a wallet
 
-NBXplorer will generate and save a mnemonic and create a derivationScheme.
+NRXplorer will generate and save a mnemonic and create a derivationScheme.
 
 HTTP POST v1/cryptos/{cryptoCode}/derivations
 
@@ -1158,12 +1158,12 @@ Request:
 }
 ```
 
-* `accountNumber`: Optional, the account number used for determining the keypath that NBXplorer will track, see `accountKeyPath` in the response. (Default: `0`)
-* `existingMnemonic`: Optional, an existing [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed to import instead of generating.
-* `wordList`: Optional, the [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) wordlist to use when generating the mnemonic, available: English, French, Japanese, Spanish, ChineseSimplified (Defaut: `English`)
-* `wordCount`: Optional, the [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) word count in the mnemonic (Default: `12`)
+* `accountNumber`: Optional, the account number used for determining the keypath that NRXplorer will track, see `accountKeyPath` in the response. (Default: `0`)
+* `existingMnemonic`: Optional, an existing [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) mnemonic seed to import instead of generating.
+* `wordList`: Optional, the [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) wordlist to use when generating the mnemonic, available: English, French, Japanese, Spanish, ChineseSimplified (Defaut: `English`)
+* `wordCount`: Optional, the [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) word count in the mnemonic (Default: `12`)
 * `scriptPubKeyType`: Optional, the type of scriptPubKey (address) to generate, available: Legacy, Segwit, SegwitP2SH (Default: `Segwit` or `Legacy` if `cryptoCode` does not support segwit)
-* `passphrase`: Optional, the [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) passphrase. (Default: empty string)
+* `passphrase`: Optional, the [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) passphrase. (Default: empty string)
 * `importKeysToRPC`: Optional, if true, every times a call to [get a new unused address](#unused) is called, the private key will be imported into the underlying node via RPC's `importprivkey`. (Default: `false`)
 * `savePrivateKeys`: If true, private keys will be saved inside the following metadata `Mnemonic`, `MasterHDKey` and `AccountHDKey`.
 
@@ -1184,27 +1184,27 @@ Response:
 }
 ```
 
-* `mnemonic`: The generated [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic.
-* `passphrase`: The [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) passphrase.
-* `wordList`: The [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) wordlist to use when generating the mnemonic.
-* `wordCount`: The [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) word count in the mnemonic.
-* `masterHDKey`: The [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) master key derived from the mnemonic and passphrase.
-* `accountHDKey`: The [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) account key derived from the `masterHDKey` and `accountKeyPath`.
-* `accountKeyPath`: The fingerprint of the master key as defined by The [BIP174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki), followed by the derivation path used to generate the `derivationScheme`. ([Purpose field](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki) based on [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), [BIP49](https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki) or [BIP84](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki) and [SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md) for the coin type)
-* `derivationScheme`: The [derivation scheme](#derivationScheme) that is being tracked by NBXplorer.
+* `mnemonic`: The generated [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) mnemonic.
+* `passphrase`: The [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) passphrase.
+* `wordList`: The [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) wordlist to use when generating the mnemonic.
+* `wordCount`: The [BIP39](https://github.com/realbit/bips/blob/master/bip-0039.mediawiki) word count in the mnemonic.
+* `masterHDKey`: The [BIP32](https://github.com/realbit/bips/blob/master/bip-0032.mediawiki) master key derived from the mnemonic and passphrase.
+* `accountHDKey`: The [BIP32](https://github.com/realbit/bips/blob/master/bip-0032.mediawiki) account key derived from the `masterHDKey` and `accountKeyPath`.
+* `accountKeyPath`: The fingerprint of the master key as defined by The [BIP174](https://github.com/realbit/bips/blob/master/bip-0174.mediawiki), followed by the derivation path used to generate the `derivationScheme`. ([Purpose field](https://github.com/realbit/bips/blob/master/bip-0043.mediawiki) based on [BIP44](https://github.com/realbit/bips/blob/master/bip-0044.mediawiki), [BIP49](https://github.com/realbit/bips/blob/master/bip-0049.mediawiki) or [BIP84](https://github.com/realbit/bips/blob/master/bip-0084.mediawiki) and [SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md) for the coin type)
+* `derivationScheme`: The [derivation scheme](#derivationScheme) that is being tracked by NRXplorer.
 
 [Metadata](#metadata) for this derivation scheme after this call:
 * `Mnemonic`: The mnemonic generated. (if `savePrivateKeys` is `true`)
-* `MasterHDKey`: The [xpriv](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) master key generated by the mnemonic and passphrase. (if `savePrivateKeys` is `true`)
-* `AccountHDKey`: The derived [xpriv](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) account key from the `MasterHDKey` and `AccountKeyPath`. (if `savePrivateKeys` is `true`)
-* `AccountKeyPath`: The fingerprint of the master key as defined by The [BIP174](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki), followed by the derivation path used to generate the `derivationScheme`. ([Purpose field](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki) based on [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki), [BIP49](https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki) or [BIP84](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki) and [SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md) for the coin type)
+* `MasterHDKey`: The [xpriv](https://github.com/realbit/bips/blob/master/bip-0032.mediawiki) master key generated by the mnemonic and passphrase. (if `savePrivateKeys` is `true`)
+* `AccountHDKey`: The derived [xpriv](https://github.com/realbit/bips/blob/master/bip-0032.mediawiki) account key from the `MasterHDKey` and `AccountKeyPath`. (if `savePrivateKeys` is `true`)
+* `AccountKeyPath`: The fingerprint of the master key as defined by The [BIP174](https://github.com/realbit/bips/blob/master/bip-0174.mediawiki), followed by the derivation path used to generate the `derivationScheme`. ([Purpose field](https://github.com/realbit/bips/blob/master/bip-0043.mediawiki) based on [BIP44](https://github.com/realbit/bips/blob/master/bip-0044.mediawiki), [BIP49](https://github.com/realbit/bips/blob/master/bip-0049.mediawiki) or [BIP84](https://github.com/realbit/bips/blob/master/bip-0084.mediawiki) and [SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md) for the coin type)
 * `ImportAddressToRPC`: `true` or `false`, depending if addresses generated are also imported to the internal node.
 
 Note that the metadata `AccountKeyPath` is leveraged by [Create a PSBT](#psbt) and [Update a PSBT](#updatepsbt).
 
 ## <a name="rpc-proxy"></a>Node RPC Proxy
 
-NBXplorer allows you to query the node's JSON-RPC through it when `exposerpc` option is enabled
+NRXplorer allows you to query the node's JSON-RPC through it when `exposerpc` option is enabled
 
 HTTP POST v1/cryptos/{cryptoCode}/rpc
 with Header `Content-Type` set to value `application/json` or `application/json-rpc`
@@ -1240,7 +1240,7 @@ NOTE: Batch commands are also supported by sending the JSON-RPC requests in an a
 
 ## <a name="health"></a>Health check
 
-A endpoint that can be used without the need for [authentication](#auth) which will returns HTTP 200 only if all nodes connected to NBXplorer are ready.
+A endpoint that can be used without the need for [authentication](#auth) which will returns HTTP 200 only if all nodes connected to NRXplorer are ready.
 
 HTTP GET /health
 
@@ -1248,15 +1248,15 @@ It will output the state for each nodes in JSON, whose format might change in th
 
 ## <a name="liquid"></a>Liquid integration
 
-NBXplorer supports liquid, the API is the same as all the other coins, except for the following:
+NRXplorer supports liquid, the API is the same as all the other coins, except for the following:
 
 * All references to `value` which normally contains an integer of the amount of the altcoin will instead output a JSON Object of type `AssetMoney`.
-* If NBXplorer is unable to unblind a value, then the value will be `null`.
+* If NRXplorer is unable to unblind a value, then the value will be `null`.
 * [When listing the transaction of a derivation scheme](#transactions), the `balanceChange` elements is instead a `JSON array of AssetMoney`.
 * [Get Balance](#balance) returns values as `JSON array of AssetMoney`.
 * [Get a new unused address](#unused) returns a confidential address. (See note below)
-* [Create Partially Signed Bitcoin Transaction](#psbt) is not supported.
-* [Update Partially Signed Bitcoin Transaction](#updatepsbt) is not supported
+* [Create Partially Signed Realbit Transaction](#psbt) is not supported.
+* [Update Partially Signed Realbit Transaction](#updatepsbt) is not supported
 * [Scan UTXO Set](#scanUtxoSet) is not supported.
 * Any sort of recovery is not supported.
 
@@ -1270,9 +1270,9 @@ The `AssetMoney` JSON format is:
 ```
 
 The blinding key of the confidential address is derived directly from the `derivationScheme`.
-If the `scriptPubKey` `0/2` is generated, the blinding private key used by NBXplorer is the SHA256 of the scriptPubKey at `0/2/0`.
+If the `scriptPubKey` `0/2` is generated, the blinding private key used by NRXplorer is the SHA256 of the scriptPubKey at `0/2/0`.
 
 In order to send in and out of liquid, we advise you to rely on the RPC command line interface of the liquid deamon.
 For doing this you need to [Generate a wallet](#wallet) with `importAddressToRPC` and `savePrivateKeys` set to `true`.
 
-Be careful to not expose your NBXplorer server on internet, your private keys can be [retrieved trivially](#getmetadata).
+Be careful to not expose your NRXplorer server on internet, your private keys can be [retrieved trivially](#getmetadata).

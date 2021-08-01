@@ -1,24 +1,24 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitMonoeci(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Monoeci.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Monoeci.Instance, networkType)
 			{
 				MinRPCVersion = 120203,
 				CoinType = NetworkType == ChainName.Mainnet ? new KeyPath("1998'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetXMCC()
+		public NRXplorerNetwork GetXMCC()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Monoeci.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Monoeci.Instance.CryptoCode);
 		}
 	}
 }

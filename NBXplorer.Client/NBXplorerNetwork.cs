@@ -1,5 +1,5 @@
-﻿using NBitcoin;
-using NBXplorer.DerivationStrategy;
+﻿using NRealbit;
+using NRXplorer.DerivationStrategy;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,17 +7,17 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-	public class NBXplorerNetwork
+	public class NRXplorerNetwork
 	{
-		internal NBXplorerNetwork(INetworkSet networkSet, ChainName networkType)
+		internal NRXplorerNetwork(INetworkSet networkSet, ChainName networkType)
 		{
-			NBitcoinNetwork = networkSet.GetNetwork(networkType);
+			NRealbitNetwork = networkSet.GetNetwork(networkType);
 			CryptoCode = networkSet.CryptoCode;
-			DefaultSettings = NBXplorerDefaultSettings.GetDefaultSettings(networkType);
+			DefaultSettings = NRXplorerDefaultSettings.GetDefaultSettings(networkType);
 		}
-		public Network NBitcoinNetwork
+		public Network NRealbitNetwork
 		{
 			get;
 			private set;
@@ -33,7 +33,7 @@ namespace NBXplorer
 			get;
 			private set;
 		}
-		public NBXplorerDefaultSettings DefaultSettings
+		public NRXplorerDefaultSettings DefaultSettings
 		{
 			get;
 			private set;
@@ -41,7 +41,7 @@ namespace NBXplorer
 
 		internal virtual DerivationStrategyFactory CreateStrategyFactory()
 		{
-			return new DerivationStrategy.DerivationStrategyFactory(NBitcoinNetwork);
+			return new DerivationStrategy.DerivationStrategyFactory(NRealbitNetwork);
 		}
 
 		public DerivationStrategy.DerivationStrategyFactory DerivationStrategyFactory
@@ -50,9 +50,9 @@ namespace NBXplorer
 			internal set;
 		}
 
-		public virtual BitcoinAddress CreateAddress(DerivationStrategyBase derivationStrategy, KeyPath keyPath, Script scriptPubKey)
+		public virtual RealbitAddress CreateAddress(DerivationStrategyBase derivationStrategy, KeyPath keyPath, Script scriptPubKey)
 		{
-			return scriptPubKey.GetDestinationAddress(NBitcoinNetwork);
+			return scriptPubKey.GetDestinationAddress(NRealbitNetwork);
 		}
 
 		public bool SupportCookieAuthentication

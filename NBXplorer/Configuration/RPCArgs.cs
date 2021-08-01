@@ -1,5 +1,5 @@
-﻿using NBitcoin;
-using NBitcoin.RPC;
+﻿using NRealbit;
+using NRealbit.RPC;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,12 +7,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using NBXplorer.Logging;
+using NRXplorer.Logging;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using System.Threading;
 
-namespace NBXplorer.Configuration
+namespace NRXplorer.Configuration
 {
 	public class RPCArgs
 	{
@@ -43,9 +43,9 @@ namespace NBXplorer.Configuration
 			set;
 		}
 
-		public RPCClient ConfigureRPCClient(NBXplorerNetwork networkInformation)
+		public RPCClient ConfigureRPCClient(NRXplorerNetwork networkInformation)
 		{
-			var network = networkInformation.NBitcoinNetwork;
+			var network = networkInformation.NRealbitNetwork;
 			RPCClient rpcClient = null;
 			var url = Url;
 			var usr = User;
@@ -88,9 +88,9 @@ namespace NBXplorer.Configuration
 			return rpcClient;
 		}
 
-		public static async Task<RPCCapabilities> TestRPCAsync(NBXplorerNetwork networkInfo, RPCClient rpcClient, CancellationToken cancellation)
+		public static async Task<RPCCapabilities> TestRPCAsync(NRXplorerNetwork networkInfo, RPCClient rpcClient, CancellationToken cancellation)
 		{
-			var network = networkInfo.NBitcoinNetwork;
+			var network = networkInfo.NRealbitNetwork;
 			Logs.Configuration.LogInformation($"{networkInfo.CryptoCode}: Testing RPC connection to " + rpcClient.Address.AbsoluteUri);
 
 			RPCResponse blockchainInfo = null;

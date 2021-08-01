@@ -1,24 +1,24 @@
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitViacoin(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Viacoin.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Viacoin.Instance, networkType)
 			{
 				MinRPCVersion = 140200,
 				CoinType = NetworkType == ChainName.Mainnet ? new KeyPath("14'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetVIA()
+		public NRXplorerNetwork GetVIA()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Viacoin.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Viacoin.Instance.CryptoCode);
 		}
 	}
 }

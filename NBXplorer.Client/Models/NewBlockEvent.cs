@@ -1,7 +1,7 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using Newtonsoft.Json;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class NewBlockEvent : NewEventBase
 	{

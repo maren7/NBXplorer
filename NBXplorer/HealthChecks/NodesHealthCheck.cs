@@ -5,16 +5,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBXplorer.HealthChecks
+namespace NRXplorer.HealthChecks
 {
 	public class NodesHealthCheck : IHealthCheck
 	{
-		public NodesHealthCheck(BitcoinDWaiters waiters)
+		public NodesHealthCheck(RealbitDWaiters waiters)
 		{
 			Waiters = waiters;
 		}
 
-		public BitcoinDWaiters Waiters { get; }
+		public RealbitDWaiters Waiters { get; }
 
 		public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
 		{

@@ -1,11 +1,11 @@
-﻿using NBitcoin;
-using NBXplorer.DerivationStrategy;
+﻿using NRealbit;
+using NRXplorer.DerivationStrategy;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public class UpdatePSBTRequest
 	{
@@ -16,7 +16,7 @@ namespace NBXplorer.Models
 		public DerivationStrategyBase DerivationScheme { get; set; }
 
 		/// <summary>
-		/// Rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NBXplorer knows about)
+		/// Rebase the hdkey paths (if no rebase, the key paths are relative to the xpub that NRXplorer knows about)
 		/// This transform (PubKey0, 0/0, accountFingerprint) by (PubKey0, m/49'/0'/0/0, masterFingerprint) 
 		/// </summary>
 		public List<PSBTRebaseKeyRules> RebaseKeyPaths { get; set; }

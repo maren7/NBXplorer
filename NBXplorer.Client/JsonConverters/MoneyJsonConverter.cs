@@ -4,10 +4,10 @@ using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin;
-using NBitcoin.JsonConverters;
+using NRealbit;
+using NRealbit.JsonConverters;
 
-namespace NBXplorer.JsonConverters
+namespace NRXplorer.JsonConverters
 {
 	public class MoneyJsonConverter : JsonConverter
 	{

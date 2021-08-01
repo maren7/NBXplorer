@@ -1,24 +1,24 @@
-using NBitcoin;
+using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitAlthash(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Althash.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Althash.Instance, networkType)
 			{
 				MinRPCVersion = 169900,
 				CoinType = networkType == ChainName.Mainnet ? new KeyPath("172'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetALTHASH()
+		public NRXplorerNetwork GetALTHASH()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Althash.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Althash.Instance.CryptoCode);
 		}
 	}
 }

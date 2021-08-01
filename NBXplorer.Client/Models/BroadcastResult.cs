@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin.RPC;
+using NRealbit.RPC;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
     public class BroadcastResult
     {

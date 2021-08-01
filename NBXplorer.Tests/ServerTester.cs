@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Logging;
-using NBXplorer.Configuration;
+using NRXplorer.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using NBitcoin;
-using NBitcoin.Tests;
+using NRealbit;
+using NRealbit.Tests;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,15 +16,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Server.Kestrel;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using NBitcoin.RPC;
+using NRealbit.RPC;
 using System.Net;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
-using NBXplorer.Logging;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.Logging;
+using NRXplorer.DerivationStrategy;
 using System.Net.Http;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public partial class ServerTester : IDisposable
 	{
@@ -97,7 +97,7 @@ namespace NBXplorer.Tests
 		{
 			try
 			{
-				var cryptoSettings = new NBXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode(CryptoCode);
+				var cryptoSettings = new NRXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode(CryptoCode);
 				NodeBuilder = NodeBuilder.Create(nodeDownloadData, Network, _Directory);
 				if (KeepPreviousData)
 					NodeBuilder.CleanBeforeStartingNode = false;
@@ -115,7 +115,7 @@ namespace NBXplorer.Tests
 				datadir = Path.Combine(_Directory, "explorer");
 				if (!KeepPreviousData && !LoadedData)
 					DeleteFolderRecursive(datadir);
-				StartNBXplorer();
+				StartNRXplorer();
 				this.Client.WaitServerStarted();
 			}
 			catch
@@ -127,7 +127,7 @@ namespace NBXplorer.Tests
 
 		public int TrimEvents { get; set; } = -1;
 		public bool UseRabbitMQ { get; set; } = false;
-		private void StartNBXplorer()
+		private void StartNRXplorer()
 		{
 			var port = CustomServer.FreeTcpPort();
 			List<(string key, string value)> keyValues = new List<(string key, string value)>();
@@ -173,18 +173,18 @@ namespace NBXplorer.Tests
 						.AddFilter("System.Net.Http.HttpClient", LogLevel.Error)
 						.AddFilter("Microsoft", LogLevel.Error)
 						.AddFilter("Hangfire", LogLevel.Error)
-						.AddFilter("NBXplorer.Authentication.BasicAuthenticationHandler", LogLevel.Critical)
+						.AddFilter("NRXplorer.Authentication.BasicAuthenticationHandler", LogLevel.Critical)
 						.AddProvider(Logs.LogProvider);
 				})
 				.UseStartup<Startup>()
 				.Build();
 
 			RPC = ((RPCClientProvider)Host.Services.GetService(typeof(RPCClientProvider))).GetRPCClient(CryptoCode);
-			NBXplorerNetwork = ((NBXplorerNetworkProvider)Host.Services.GetService(typeof(NBXplorerNetworkProvider))).GetFromCryptoCode(CryptoCode);
+			NRXplorerNetwork = ((NRXplorerNetworkProvider)Host.Services.GetService(typeof(NRXplorerNetworkProvider))).GetFromCryptoCode(CryptoCode);
 			var conf = (ExplorerConfiguration)Host.Services.GetService(typeof(ExplorerConfiguration));
 			Host.Start();
 			Configuration = conf;
-			_Client = NBXplorerNetwork.CreateExplorerClient(Address);
+			_Client = NRXplorerNetwork.CreateExplorerClient(Address);
 			HttpClient = ((IHttpClientFactory)Host.Services.GetService(typeof(IHttpClientFactory))).CreateClient();
 			HttpClient.BaseAddress = Address;
 			_Client.SetCookieAuth(Path.Combine(conf.DataDir, ".cookie"));
@@ -200,7 +200,7 @@ namespace NBXplorer.Tests
 			Host.Dispose();
 			if (deleteAll)
 				DeleteFolderRecursive(datadir);
-			StartNBXplorer();
+			StartNRXplorer();
 			this.Client.WaitServerStarted();
 		}
 
@@ -271,10 +271,10 @@ namespace NBXplorer.Tests
 		{
 			get
 			{
-				return NBXplorerNetwork.NBitcoinNetwork;
+				return NRXplorerNetwork.NRealbitNetwork;
 			}
 		}
-		public NBXplorerNetwork NBXplorerNetwork
+		public NRXplorerNetwork NRXplorerNetwork
 		{
 			get;
 			internal set;
@@ -353,12 +353,12 @@ namespace NBXplorer.Tests
 			}
 		}
 
-		public BitcoinSecret PrivateKeyOf(BitcoinExtKey key, string path)
+		public RealbitSecret PrivateKeyOf(RealbitExtKey key, string path)
 		{
-			return new BitcoinSecret(key.ExtKey.Derive(new KeyPath(path)).PrivateKey, Network);
+			return new RealbitSecret(key.ExtKey.Derive(new KeyPath(path)).PrivateKey, Network);
 		}
 
-		public BitcoinAddress AddressOf(BitcoinExtKey key, string path)
+		public RealbitAddress AddressOf(RealbitExtKey key, string path)
 		{
 			if (this.RPC.Capabilities.SupportSegwit)
 				return key.ExtKey.Derive(new KeyPath(path)).Neuter().PubKey.WitHash.GetAddress(Network);
@@ -366,7 +366,7 @@ namespace NBXplorer.Tests
 				return key.ExtKey.Derive(new KeyPath(path)).Neuter().PubKey.Hash.GetAddress(Network);
 		}
 
-		public BitcoinAddress AddressOf(DerivationStrategyBase scheme, string path)
+		public RealbitAddress AddressOf(DerivationStrategyBase scheme, string path)
 		{
 			return scheme.GetDerivation(KeyPath.Parse(path)).ScriptPubKey.GetDestinationAddress(Network);
 		}
@@ -382,7 +382,7 @@ namespace NBXplorer.Tests
 			string suffix = this.RPC.Capabilities.SupportSegwit ? "" : "-[legacy]";
 			suffix += p2sh ? "-[p2sh]" : "";
 			scriptPubKeyType = p2sh ? ScriptPubKeyType.SegwitP2SH : ScriptPubKeyType.Segwit;
-			return NBXplorerNetwork.DerivationStrategyFactory.Parse($"{pubKey.ToString(this.Network)}{suffix}");
+			return NRXplorerNetwork.DerivationStrategyFactory.Parse($"{pubKey.ToString(this.Network)}{suffix}");
 		}
 		ExtKey key;
 		ScriptPubKeyType scriptPubKeyType;
@@ -398,7 +398,7 @@ namespace NBXplorer.Tests
 		public bool KeepPreviousData { get; set; }
 		public bool LoadedData { get; private set; }
 
-		public uint256 SendToAddress(BitcoinAddress address, Money amount)
+		public uint256 SendToAddress(RealbitAddress address, Money amount)
 		{
 			return SendToAddressAsync(address, amount).GetAwaiter().GetResult();
 		}
@@ -412,14 +412,14 @@ namespace NBXplorer.Tests
 			return SendToAddressAsync(scriptPubKey.GetDestinationAddress(Network), amount);
 		}
 
-		public async Task<uint256> SendToAddressAsync(BitcoinAddress address, Money amount)
+		public async Task<uint256> SendToAddressAsync(RealbitAddress address, Money amount)
 		{
 			List<object> parameters = new List<object>();
 			parameters.Add(address.ToString());
 			if (RPCStringAmount)
 				parameters.Add(amount.ToString());
 			else
-				parameters.Add(amount.ToDecimal(MoneyUnit.BTC));
+				parameters.Add(amount.ToDecimal(MoneyUnit.BRLB));
 			var resp = await RPC.SendCommandAsync(RPCOperations.sendtoaddress, parameters.ToArray());
 			return uint256.Parse(resp.Result.ToString());
 		}
@@ -432,7 +432,7 @@ namespace NBXplorer.Tests
 				{
 					cts.Token.ThrowIfCancellationRequested();
 					var status = Client.GetStatus();
-					if (status.SyncHeight == status.BitcoinStatus.Blocks)
+					if (status.SyncHeight == status.RealbitStatus.Blocks)
 					{
 						break;
 					}

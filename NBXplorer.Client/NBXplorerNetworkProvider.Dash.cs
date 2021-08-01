@@ -1,24 +1,24 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitDash(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Dash.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Dash.Instance, networkType)
 			{
 				MinRPCVersion = 120000,
 				CoinType = networkType == ChainName.Mainnet ? new KeyPath("5'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetDASH()
+		public NRXplorerNetwork GetDASH()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Dash.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Dash.Instance.CryptoCode);
 		}
 	}
 }

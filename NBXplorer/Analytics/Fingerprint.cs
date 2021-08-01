@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NBXplorer.Analytics
+namespace NRXplorer.Analytics
 {
 	[Flags]
 	public enum Fingerprint : ulong

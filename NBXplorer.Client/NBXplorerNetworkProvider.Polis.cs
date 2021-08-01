@@ -1,24 +1,24 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitPolis(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Polis.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Polis.Instance, networkType)
 			{
 				MinRPCVersion = 1030000,
 				CoinType = NetworkType == ChainName.Mainnet ? new KeyPath("1997'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetPOLIS()
+		public NRXplorerNetwork GetPOLIS()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Polis.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Polis.Instance.CryptoCode);
 		}
 	}
 }

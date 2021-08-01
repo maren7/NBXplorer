@@ -9,16 +9,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc;
-using NBitcoin.JsonConverters;
+using NRealbit.JsonConverters;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Http.Features;
-using NBXplorer.Filters;
-using NBXplorer.Logging;
+using NRXplorer.Filters;
+using NRXplorer.Logging;
 using Microsoft.AspNetCore.Authentication;
-using NBXplorer.Authentication;
-using NBXplorer.Configuration;
+using NRXplorer.Authentication;
+using NRXplorer.Configuration;
 #if NETCOREAPP21
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 #else
@@ -26,7 +26,7 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.Hosting;
 #endif
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class Startup
 	{
@@ -46,7 +46,7 @@ namespace NBXplorer
 			{
 				httpClient.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
 			});
-			services.AddNBXplorer();
+			services.AddNRXplorer();
 			services.ConfigureNBxplorer(Configuration);
 			var builder = services.AddMvcCore();
 #if NETCOREAPP21
@@ -63,7 +63,7 @@ namespace NBXplorer
 			.AddAuthorization()
 			.AddFormatterMappings();
 			services.AddAuthentication("Basic")
-				.AddNBXplorerAuthentication();
+				.AddNRXplorerAuthentication();
 		}
 
 		public void Configure(IApplicationBuilder app, IServiceProvider prov,

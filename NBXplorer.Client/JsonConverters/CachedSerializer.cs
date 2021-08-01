@@ -1,6 +1,6 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Linq;
-using NBitcoin.JsonConverters;
+using NRealbit.JsonConverters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-namespace NBXplorer.JsonConverters
+namespace NRXplorer.JsonConverters
 {
 	/// <summary>
 	/// Cache serialization of costly base58 structures
@@ -52,7 +52,7 @@ namespace NBXplorer.JsonConverters
 				return Converter.CanConvert(objectType);
 			}
 		}
-		public CachedSerializer(NBXplorerNetwork network)
+		public CachedSerializer(NRXplorerNetwork network)
 		{
 			if (network == null)
 				throw new ArgumentNullException(nameof(network));

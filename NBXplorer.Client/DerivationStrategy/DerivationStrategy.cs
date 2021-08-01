@@ -1,5 +1,5 @@
-﻿using NBitcoin;
-using NBXplorer.DerivationStrategy;
+﻿using NRealbit;
+using NRXplorer.DerivationStrategy;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NBXplorer.DerivationStrategy
+namespace NRXplorer.DerivationStrategy
 {
 	public class DerivationStrategyOptions
 	{
@@ -108,13 +108,13 @@ namespace NBXplorer.DerivationStrategy
 									.OfType<Group>()
 									.Skip(2)
 									.SelectMany(g => g.Captures.OfType<Capture>())
-									.Select(g => new BitcoinExtPubKey(g.Value.Substring(1), Network))
+									.Select(g => new RealbitExtPubKey(g.Value.Substring(1), Network))
 									.ToArray();
 				return CreateMultiSigDerivationStrategy(pubKeys, sigCount, options);
 			}
 			else
 			{
-				var key = _Network.Parse<BitcoinExtPubKey>(str);
+				var key = _Network.Parse<RealbitExtPubKey>(str);
 				return CreateDirectDerivationStrategy(key, options);
 			}
 		}
@@ -136,7 +136,7 @@ namespace NBXplorer.DerivationStrategy
 		/// <param name="publicKey">The public key of the wallet</param>
 		/// <param name="options">Derivation options</param>
 		/// <returns></returns>
-		public DerivationStrategyBase CreateDirectDerivationStrategy(BitcoinExtPubKey publicKey, DerivationStrategyOptions options = null)
+		public DerivationStrategyBase CreateDirectDerivationStrategy(RealbitExtPubKey publicKey, DerivationStrategyOptions options = null)
 		{
 			options = options ?? new DerivationStrategyOptions();
 			DerivationStrategyBase strategy = new DirectDerivationStrategy(publicKey, options.ScriptPubKeyType != ScriptPubKeyType.Legacy, options.AdditionalOptions);
@@ -169,7 +169,7 @@ namespace NBXplorer.DerivationStrategy
 		/// <param name="sigCount">The number of required signature</param>
 		/// <param name="options">Derivation options</param>
 		/// <returns>A multisig derivation strategy</returns>
-		public DerivationStrategyBase CreateMultiSigDerivationStrategy(BitcoinExtPubKey[] pubKeys, int sigCount, DerivationStrategyOptions options = null)
+		public DerivationStrategyBase CreateMultiSigDerivationStrategy(RealbitExtPubKey[] pubKeys, int sigCount, DerivationStrategyOptions options = null)
 		{
 			options = options ?? new DerivationStrategyOptions();
 			DerivationStrategyBase derivationStrategy = new MultisigDerivationStrategy(sigCount, pubKeys.ToArray(), options.ScriptPubKeyType == ScriptPubKeyType.Legacy, !options.KeepOrder, options.AdditionalOptions);

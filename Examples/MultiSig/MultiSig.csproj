@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NBXplorer.Client" Version="3.0.20" />
+    <PackageReference Include="NRXplorer.Client" Version="3.0.20" />
   </ItemGroup>
 
 </Project>

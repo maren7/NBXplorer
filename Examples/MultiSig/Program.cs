@@ -1,8 +1,8 @@
-﻿using NBitcoin;
-using NBitcoin.RPC;
-using NBXplorer;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+﻿using NRealbit;
+using NRealbit.RPC;
+using NRXplorer;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 using System;
 using System.Data;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace MultiSig
 
                 // The AccountKeyPath should be stored along the AccountExtPubKey
                 // This is the keypath + the hash of the root hd key.
-                // During signing, NBitcoin need this information to derive the RootExtKey to the address keypath properly.
+                // During signing, NRealbit need this information to derive the RootExtKey to the address keypath properly.
                 AccountKeyPath = new RootedKeyPath(RootExtKey.GetPublicKey().GetHDFingerPrint(), accountKeyPath);
             }
             public string PartyName;
@@ -37,13 +37,13 @@ namespace MultiSig
 
         // We will:
         // 1. Create a multi sig wallet of Alice and Bob
-        // 2. Fund it with 1 BTC
-        // 3. Send 0.4 BTC to a random address from it
+        // 2. Fund it with 1 BRLB
+        // 3. Send 0.4 BRLB to a random address from it
         public static async Task Main(string[] args)
         {
-            // Start bitcoind and NBXplorer in regtest:
-            // * Run "bitcoind -regtest"
-            // * Run ".\build.ps1", then ".\run.ps1 -regtest" in NBXplorer
+            // Start realbitd and NRXplorer in regtest:
+            // * Run "realbitd -regtest"
+            // * Run ".\build.ps1", then ".\run.ps1 -regtest" in NRXplorer
 
             var network = Network.RegTest;
             var client = CreateNBXClient(network);
@@ -74,7 +74,7 @@ namespace MultiSig
             Console.WriteLine("---");
             Console.WriteLine($"The derivation strategy '{derivationStrategy}' represents all the data you need to know to track the multisig wallet");
 
-            // NBXplorer will start tracking this wallet.
+            // NRXplorer will start tracking this wallet.
             await client.TrackAsync(derivationStrategy);
             // This allow you to get events out of NBXPlorer
             var evts = client.CreateLongPollingNotificationSession();
@@ -83,9 +83,9 @@ namespace MultiSig
             var address1 = (await client.GetUnusedAsync(derivationStrategy, DerivationFeature.Deposit)).Address;
 
             var rpc = new RPCClient(network);
-            // If that fail, your bitcoin node need some bitcoins
-            // bitcoin-cli -regtest getnewaddress
-            // bitcoin-cli -regtest generatetoaddress 101 <address>
+            // If that fail, your realbit node need some realbits
+            // realbit-cli -regtest getnewaddress
+            // realbit-cli -regtest generatetoaddress 101 <address>
             await rpc.SendToAddressAsync(address1, Money.Coins(1.0m));
 
             await WaitTransaction(evts, derivationStrategy);
@@ -110,12 +110,12 @@ namespace MultiSig
                     {
                         Destination = randomDestination,
                         Amount = Money.Coins(0.4m),
-                        SubstractFees = true // We will pay fee by sending to destination a bit less than 0.4 BTC
+                        SubstractFees = true // We will pay fee by sending to destination a bit less than 0.4 BRLB
                     }
                 },
                 FeePreference = new FeePreference()
                 {
-                    // 10 sat/byte. You can remove this in prod, as it will use bitcoin's core estimation.
+                    // 10 sat/byte. You can remove this in prod, as it will use realbit's core estimation.
                     ExplicitFeeRate = new FeeRate(10.0m)
                 }
             })).PSBT;
@@ -139,8 +139,8 @@ namespace MultiSig
         {
             psbt = psbt.Clone();
 
-            // NBXplorer does not have knowledge of the account key path, KeyPath are private information of each peer
-            // NBXplorer only derive 0/* and 1/* on top of provided account xpubs,
+            // NRXplorer does not have knowledge of the account key path, KeyPath are private information of each peer
+            // NRXplorer only derive 0/* and 1/* on top of provided account xpubs,
             // This mean that the input keypaths in the PSBT are in the form 0/* (as if the account key was the root)
             // RebaseKeyPaths modifies the PSBT by adding the AccountKeyPath in prefix of all the keypaths of the PSBT
 
@@ -165,7 +165,7 @@ namespace MultiSig
             while (true)
             {
                 var evt = await evts.NextEventAsync();
-                if (evt is NBXplorer.Models.NewTransactionEvent tx)
+                if (evt is NRXplorer.Models.NewTransactionEvent tx)
                 {
                     if (tx.DerivationStrategy == derivationStrategy)
                         return tx;
@@ -175,8 +175,8 @@ namespace MultiSig
 
         private static ExplorerClient CreateNBXClient(Network network)
         {
-            NBXplorerNetworkProvider provider = new NBXplorerNetworkProvider(network.ChainName);
-            ExplorerClient client = new NBXplorer.ExplorerClient(provider.GetFromCryptoCode(network.NetworkSet.CryptoCode));
+            NRXplorerNetworkProvider provider = new NRXplorerNetworkProvider(network.ChainName);
+            ExplorerClient client = new NRXplorer.ExplorerClient(provider.GetFromCryptoCode(network.NetworkSet.CryptoCode));
             return client;
         }
     }

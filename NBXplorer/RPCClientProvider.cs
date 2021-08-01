@@ -1,12 +1,12 @@
-﻿using NBitcoin.RPC;
-using NBXplorer.Configuration;
+﻿using NRealbit.RPC;
+using NRXplorer.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class RPCClientProvider
 	{
@@ -34,7 +34,7 @@ namespace NBXplorer
 			_ChainConfigurations.TryGetValue(cryptoCode, out RPCClient rpc);
 			return rpc;
 		}
-		public RPCClient GetRPCClient(NBXplorerNetwork network)
+		public RPCClient GetRPCClient(NRXplorerNetwork network)
 		{
 			return GetRPCClient(network.CryptoCode);
 		}

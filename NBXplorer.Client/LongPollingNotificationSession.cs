@@ -6,10 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
-using NBXplorer.Models;
+using NRXplorer.Models;
 using System.Collections.Concurrent;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class LongPollingNotificationSession : NotificationSessionBase
 	{

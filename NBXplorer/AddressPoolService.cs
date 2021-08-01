@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Logging;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace NBXplorer
+namespace NRXplorer
 {
 	public class AddressPoolService : IHostedService
 	{
@@ -67,14 +67,14 @@ namespace NBXplorer
 			}
 		}
 
-		public AddressPoolService(NBXplorerNetworkProvider networks, RepositoryProvider repositoryProvider, KeyPathTemplates keyPathTemplates)
+		public AddressPoolService(NRXplorerNetworkProvider networks, RepositoryProvider repositoryProvider, KeyPathTemplates keyPathTemplates)
 		{
 			this.networks = networks;
 			this.repositoryProvider = repositoryProvider;
 			this.keyPathTemplates = keyPathTemplates;
 		}
-		Dictionary<NBXplorerNetwork, AddressPool> _AddressPoolByNetwork;
-		private readonly NBXplorerNetworkProvider networks;
+		Dictionary<NRXplorerNetwork, AddressPool> _AddressPoolByNetwork;
+		private readonly NRXplorerNetworkProvider networks;
 		private readonly RepositoryProvider repositoryProvider;
 		private readonly KeyPathTemplates keyPathTemplates;
 
@@ -85,7 +85,7 @@ namespace NBXplorer
 			await Task.WhenAll(_AddressPoolByNetwork.Select(kv => kv.Value.StartAsync(cancellationToken)));
 		}
 
-		public Task GenerateAddresses(NBXplorerNetwork network, DerivationStrategyBase derivationStrategy, DerivationFeature feature, GenerateAddressQuery generateAddressQuery = null)
+		public Task GenerateAddresses(NRXplorerNetwork network, DerivationStrategyBase derivationStrategy, DerivationFeature feature, GenerateAddressQuery generateAddressQuery = null)
 		{
 			var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 			if (!_AddressPoolByNetwork[network]._Channel.Writer.TryWrite(new RefillPoolRequest() { DerivationStrategy = derivationStrategy, Feature = feature, Done = completion, GenerateAddressQuery = generateAddressQuery }))
@@ -102,7 +102,7 @@ namespace NBXplorer
 			catch { }
 		}
 
-		internal Task GenerateAddresses(NBXplorerNetwork network, TrackedTransaction[] matches)
+		internal Task GenerateAddresses(NRXplorerNetwork network, TrackedTransaction[] matches)
 		{
 			List<Task> refill = new List<Task>();
 			foreach (var m in matches)

@@ -1,13 +1,13 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System.Reflection;
-using NBXplorer.DerivationStrategy;
+using NRXplorer.DerivationStrategy;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NBitcoin.JsonConverters;
+using NRealbit.JsonConverters;
 
-namespace NBXplorer.JsonConverters
+namespace NRXplorer.JsonConverters
 {
 	public class DerivationStrategyJsonConverter : JsonConverter
 	{

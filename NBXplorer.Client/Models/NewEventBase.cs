@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace NBXplorer.Models
+namespace NRXplorer.Models
 {
 	public abstract class NewEventBase
 	{

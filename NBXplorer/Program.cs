@@ -6,20 +6,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using NBXplorer.Configuration;
-using NBXplorer.Logging;
-using NBitcoin.Protocol;
+using NRXplorer.Configuration;
+using NRXplorer.Logging;
+using NRealbit.Protocol;
 using System.Collections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore;
-using NBitcoin;
+using NRealbit;
 using System.Text;
 using System.Net;
 using CommandLine;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("NBXplorer.Tests")]
-namespace NBXplorer
+[assembly: InternalsVisibleTo("NRXplorer.Tests")]
+namespace NRXplorer
 {
 	public class Program
 	{
@@ -48,7 +48,7 @@ namespace NBXplorer
 					{
 						l.AddFilter("Microsoft", LogLevel.Error);
 						l.AddFilter("System.Net.Http.HttpClient", LogLevel.Critical);
-						l.AddFilter("NBXplorer.Authentication.BasicAuthenticationHandler", LogLevel.Critical);
+						l.AddFilter("NRXplorer.Authentication.BasicAuthenticationHandler", LogLevel.Critical);
 						if(conf.GetOrDefault<bool>("verbose", false))
 						{
 							l.SetMinimumLevel(LogLevel.Debug);

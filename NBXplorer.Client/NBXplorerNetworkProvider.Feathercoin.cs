@@ -1,24 +1,24 @@
-﻿using NBitcoin;
+﻿using NRealbit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NBXplorer
+namespace NRXplorer
 {
-    public partial class NBXplorerNetworkProvider
+    public partial class NRXplorerNetworkProvider
     {
 		private void InitFeathercoin(ChainName networkType)
 		{
-			Add(new NBXplorerNetwork(NBitcoin.Altcoins.Feathercoin.Instance, networkType)
+			Add(new NRXplorerNetwork(NRealbit.Altcoins.Feathercoin.Instance, networkType)
 			{
 				MinRPCVersion = 160000,
 				CoinType = networkType == ChainName.Mainnet ? new KeyPath("8'") : new KeyPath("1'")
 			});
 		}
 
-		public NBXplorerNetwork GetFTC()
+		public NRXplorerNetwork GetFTC()
 		{
-			return GetFromCryptoCode(NBitcoin.Altcoins.Feathercoin.Instance.CryptoCode);
+			return GetFromCryptoCode(NRealbit.Altcoins.Feathercoin.Instance.CryptoCode);
 		}
 	}
 }

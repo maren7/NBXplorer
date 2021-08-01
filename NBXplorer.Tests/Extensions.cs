@@ -1,14 +1,14 @@
-﻿using NBitcoin;
-using NBXplorer.Models;
+﻿using NRealbit;
+using NRXplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using NBXplorer.DerivationStrategy;
-using NBitcoin.RPC;
+using NRXplorer.DerivationStrategy;
+using NRealbit.RPC;
 using System.Threading;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public static class Extensions
 	{
@@ -16,7 +16,7 @@ namespace NBXplorer.Tests
 		{
 			session.WaitForTransaction(TrackedSource.Create(derivationStrategy), txId);
 		}
-		public static void WaitForTransaction(this LongPollingNotificationSession session, BitcoinAddress address, uint256 txId)
+		public static void WaitForTransaction(this LongPollingNotificationSession session, RealbitAddress address, uint256 txId)
 		{
 			session.WaitForTransaction(TrackedSource.Create(address), txId);
 		}
@@ -60,7 +60,7 @@ namespace NBXplorer.Tests
 			return strategy.GetLineFor(KeyPathTemplates.Default.GetKeyPathTemplate(feature));
 		}
 
-		static BitcoinAddress Dummy = new Key().PubKey.GetAddress(ScriptPubKeyType.Legacy, Network.Main);
+		static RealbitAddress Dummy = new Key().PubKey.GetAddress(ScriptPubKeyType.Legacy, Network.Main);
 		public static KeyPathInformation GetKeyInformation(this Repository repo, Script script)
 		{
 			return repo.GetKeyInformations(new Script[] { script }).GetAwaiter().GetResult()[script].SingleOrDefault();

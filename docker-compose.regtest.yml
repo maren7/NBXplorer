@@ -8,35 +8,35 @@ services:
     build:
       context: .
     environment:
-      NBXPLORER_NETWORK: ${NBITCOIN_NETWORK:-regtest}
+      NBXPLORER_NETWORK: ${NREALBIT_NETWORK:-regtest}
       NBXPLORER_BIND: 0.0.0.0:32838
       NBXPLORER_NOAUTH: 1
-      NBXPLORER_CHAINS: "btc,lbtc"
-      NBXPLORER_BTCRPCURL: http://bitcoind:43782/
-      NBXPLORER_BTCNODEENDPOINT: bitcoind:39388
+      NBXPLORER_CHAINS: "brlb,lbrlb"
+      NBXPLORER_BRLBRPCURL: http://realbitd:43782/
+      NBXPLORER_BRLBNODEENDPOINT: realbitd:39388
       NBXPLORER_RMQHOST: rabbitmq
       NBXPLORER_RMQVIRTUAL: / 
       NBXPLORER_RMQUSER: guest
       NBXPLORER_RMQPASS: guest
       NBXPLORER_RMQTRANEX: NewTransaction
       NBXPLORER_RMQBLOCKEX: NewBlock
-      NBXPLORER_LBTCRPCURL: http://elementsd-liquid:43783/
-      NBXPLORER_LBTCNODEENDPOINT: elementsd-liquid:39389
+      NBXPLORER_LBRLBRPCURL: http://elementsd-liquid:43783/
+      NBXPLORER_LBRLBNODEENDPOINT: elementsd-liquid:39389
     volumes:
       - "nbxplorer_datadir:/datadir"
-      - "bitcoin_datadir:/root/.bitcoin"
+      - "realbit_datadir:/root/.realbit"
       - "elementsd_liquid_datadir:/root/.elements"
     links:
-      - bitcoind
+      - realbitd
       - rabbitmq
 
-  bitcoind:
+  realbitd:
     restart: always
-    container_name: btcpayserver_bitcoind
-    image: btcpayserver/bitcoin:0.18.0-1
+    container_name: brlbpayserver_realbitd
+    image: brlbpayserver/realbit:0.18.0-1
     environment:
-      BITCOIN_NETWORK: ${NBITCOIN_NETWORK:-regtest}
-      BITCOIN_EXTRA_ARGS: |
+      REALBIT_NETWORK: ${NREALBIT_NETWORK:-regtest}
+      REALBIT_EXTRA_ARGS: |
         rpcport=43782
         rpcbind=0.0.0.0:43782
         port=39388
@@ -49,7 +49,7 @@ services:
       - "43782:43782"
       - "39388:39388"
     volumes:
-    - "bitcoin_datadir:/data"
+    - "realbit_datadir:/data"
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -62,13 +62,13 @@ services:
       
   elementsd-liquid:
     restart: always
-    container_name: btcpayserver_elementsd_liquid
-    image: btcpayserver/elements:0.18.1.1
+    container_name: brlbpayserver_elementsd_liquid
+    image: brlbpayserver/elements:0.18.1.1
     environment:
       ELEMENTS_CHAIN: elementsregtest
       ELEMENTS_EXTRA_ARGS: |
         mainchainrpcport=43782
-        mainchainrpchost=bitcoind
+        mainchainrpchost=realbitd
         mainchainrpcuser=liquid
         mainchainrpcpassword=liquid
         rpcport=19332
@@ -90,5 +90,5 @@ services:
     
 volumes:
   nbxplorer_datadir: 
-  bitcoin_datadir:
+  realbit_datadir:
   elementsd_liquid_datadir: 

@@ -4,7 +4,7 @@
     <TargetFramework Condition="'$(TargetFrameworkOverride)' == ''">netcoreapp3.1</TargetFramework>
     <TargetFramework Condition="'$(TargetFrameworkOverride)' != ''">$(TargetFrameworkOverride)</TargetFramework>
     <Version>2.1.55</Version>
-	  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\NBXplorer.xml</DocumentationFile>
+	  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\NRXplorer.xml</DocumentationFile>
 	  <NoWarn>1701;1702;1705;1591;CS1591</NoWarn>
 	  <LangVersion>8.0</LangVersion>
   </PropertyGroup>
@@ -31,7 +31,7 @@
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
 	  <PackageReference Include="NicolasDorier.CommandLine" Version="1.0.0.2" />
 	  <PackageReference Include="NicolasDorier.CommandLine.Configuration" Version="1.0.0.3" />
-    <ProjectReference Include="..\NBXplorer.Client\NBXplorer.Client.csproj" />
+    <ProjectReference Include="..\NRXplorer.Client\NRXplorer.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

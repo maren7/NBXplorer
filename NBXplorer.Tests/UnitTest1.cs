@@ -1,10 +1,10 @@
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
-using NBitcoin;
-using NBitcoin.Protocol;
-using NBitcoin.RPC;
-using NBXplorer.DerivationStrategy;
-using NBXplorer.Models;
+using NRealbit;
+using NRealbit.Protocol;
+using NRealbit.RPC;
+using NRXplorer.DerivationStrategy;
+using NRXplorer.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NBitcoin.Altcoins.Elements;
+using NRealbit.Altcoins.Elements;
 using Xunit;
 using Xunit.Abstractions;
 using System.Net.Http;
@@ -25,7 +25,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace NBXplorer.Tests
+namespace NRXplorer.Tests
 {
 	public class UnitTest1
 	{
@@ -34,8 +34,8 @@ namespace NBXplorer.Tests
 			Logs.Tester = new XUnitLog(helper) { Name = "Tests" };
 			Logs.LogProvider = new XUnitLogProvider(helper);
 		}
-		NBXplorerNetworkProvider _Provider = new NBXplorerNetworkProvider(ChainName.Regtest);
-		private NBXplorerNetwork GetNetwork(INetworkSet network)
+		NRXplorerNetworkProvider _Provider = new NRXplorerNetworkProvider(ChainName.Regtest);
+		private NRXplorerNetwork GetNetwork(INetworkSet network)
 		{
 			return _Provider.GetFromCryptoCode(network.CryptoCode);
 		}
@@ -45,7 +45,7 @@ namespace NBXplorer.Tests
 		{
 			foreach (var networkType in new[] { ChainName.Mainnet, ChainName.Testnet, ChainName.Regtest })
 			{
-				_ = new NBXplorerNetworkProvider((ChainName)networkType);
+				_ = new NRXplorerNetworkProvider((ChainName)networkType);
 			}
 		}
 
@@ -266,7 +266,7 @@ namespace NBXplorer.Tests
 
 		private static void MarkAsUsed(Repository repository, DerivationStrategyBase strat, KeyPath keyPath)
 		{
-			var tx = repository.Network.NBitcoinNetwork.Consensus.ConsensusFactory.CreateTransaction();
+			var tx = repository.Network.NRealbitNetwork.Consensus.ConsensusFactory.CreateTransaction();
 			repository.SaveMatches(new[] {
 				new TrackedTransaction(
 					new TrackedTransactionKey(tx.GetHash(), null, false),
@@ -290,7 +290,7 @@ namespace NBXplorer.Tests
 				});
 				tester.Client.Track(userDerivationScheme);
 
-				// Send 1 BTC
+				// Send 1 BRLB
 				var newAddress = tester.Client.GetUnused(userDerivationScheme, DerivationFeature.Direct);
 				var txId = tester.SendToAddress(newAddress.ScriptPubKey, Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(userDerivationScheme, txId);
@@ -298,7 +298,7 @@ namespace NBXplorer.Tests
 				tester.RPC.Generate(1);
 				tester.Notifications.WaitForBlocks();
 
-				// Send 1 more BTC
+				// Send 1 more BRLB
 				newAddress = tester.Client.GetUnused(userDerivationScheme, DerivationFeature.Deposit);
 				txId = tester.SendToAddress(newAddress.ScriptPubKey, Money.Coins(1.1m));
 				tester.Notifications.WaitForTransaction(userDerivationScheme, txId);
@@ -367,12 +367,12 @@ namespace NBXplorer.Tests
 				Assert.NotNull(spendingPSBT.Inputs[0].WitnessUtxo);
 				///////////////////////////
 
-				CanCreatePSBTCore(tester, true);
-				CanCreatePSBTCore(tester, false);
+				CanCreatePSBRLBore(tester, true);
+				CanCreatePSBRLBore(tester, false);
 			}
 		}
 
-		private static void CanCreatePSBTCore(ServerTester tester, bool segwit)
+		private static void CanCreatePSBRLBore(ServerTester tester, bool segwit)
 		{
 			var userExtKey = new ExtKey();
 			var userDerivationScheme = tester.Client.Network.DerivationStrategyFactory.CreateDirectDerivationStrategy(userExtKey.Neuter(), new DerivationStrategyOptions()
@@ -388,13 +388,13 @@ namespace NBXplorer.Tests
 			tester.Client.Track(userDerivationScheme2);
 			var newAddress2 = tester.Client.GetUnused(userDerivationScheme2, DerivationFeature.Deposit, skip: 2);
 
-			// Send 1 BTC
+			// Send 1 BRLB
 			var newAddress = tester.Client.GetUnused(userDerivationScheme, DerivationFeature.Direct);
 			var txId = tester.SendToAddress(newAddress.ScriptPubKey, Money.Coins(1.0m));
 			tester.Notifications.WaitForTransaction(userDerivationScheme, txId);
 			var utxos = tester.Client.GetUTXOs(userDerivationScheme);
 
-			// Send 1 more BTC
+			// Send 1 more BRLB
 			newAddress = tester.Client.GetUnused(userDerivationScheme, DerivationFeature.Deposit);
 			txId = tester.SendToAddress(newAddress.ScriptPubKey, Money.Coins(1.0m));
 			tester.Notifications.WaitForTransaction(userDerivationScheme, txId);
@@ -559,7 +559,7 @@ namespace NBXplorer.Tests
 			Assert.Equal(psbt2.PSBT, psbt3.PSBT);
 
 			Logs.Tester.LogInformation("Let's change that if ReserveChangeAddress is true, but the transaction fails to build, no address get reserverd");
-			var ex = Assert.Throws<NBXplorerException>(() => psbt2 = tester.Client.CreatePSBT(userDerivationScheme, new CreatePSBTRequest()
+			var ex = Assert.Throws<NRXplorerException>(() => psbt2 = tester.Client.CreatePSBT(userDerivationScheme, new CreatePSBTRequest()
 			{
 				Destinations =
 						{
@@ -603,7 +603,7 @@ namespace NBXplorer.Tests
 
 			Logs.Tester.LogInformation("Let's check that we can filter UTXO by confirmations");
 			Logs.Tester.LogInformation("We have no confirmation, so we should not have enough money if asking for min 1 conf");
-			ex = Assert.Throws<NBXplorerException>(() => psbt2 = tester.Client.CreatePSBT(userDerivationScheme, new CreatePSBTRequest()
+			ex = Assert.Throws<NRXplorerException>(() => psbt2 = tester.Client.CreatePSBT(userDerivationScheme, new CreatePSBTRequest()
 			{
 				Destinations =
 						{
@@ -689,7 +689,7 @@ namespace NBXplorer.Tests
 			Assert.Single(actualOutpoints);
 			Assert.Equal(outpoints[0], actualOutpoints[0]);
 			request.MinValue = Money.Coins(0.1m);
-			ex = Assert.Throws<NBXplorerException>(() => tester.Client.CreatePSBT(userDerivationScheme, request));
+			ex = Assert.Throws<NRXplorerException>(() => tester.Client.CreatePSBT(userDerivationScheme, request));
 			Assert.Equal("not-enough-funds", ex.Error.Code);
 
 			psbt2 = tester.Client.CreatePSBT(userDerivationScheme, new CreatePSBTRequest()
@@ -838,7 +838,7 @@ namespace NBXplorer.Tests
 			Assert.Equal(3, psbt2.PSBT.Outputs.Count);
 			Assert.Equal(2, psbt2.PSBT.Outputs.Where(o => o.HDKeyPaths.Any()).Count());
 			var selfchange = Assert.Single(psbt2.PSBT.Outputs.Where(o => o.HDKeyPaths.Any(h => h.Key.GetAddress(segwit ? ScriptPubKeyType.Segwit : ScriptPubKeyType.Legacy, tester.Network).ScriptPubKey == newAddress.ScriptPubKey)));
-			Assert.All(psbt2.PSBT.Inputs.Concat<PSBTCoin>(new[] { selfchange }).SelectMany(i => i.HDKeyPaths), i =>
+			Assert.All(psbt2.PSBT.Inputs.Concat<PSBRLBoin>(new[] { selfchange }).SelectMany(i => i.HDKeyPaths), i =>
 			{
 				Assert.Equal(rootHD, i.Value.MasterFingerprint);
 				Assert.StartsWith("49'/0'", i.Value.KeyPath.ToString());
@@ -1117,7 +1117,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 
@@ -1212,7 +1212,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 
@@ -1275,7 +1275,7 @@ namespace NBXplorer.Tests
 				Assert.Equal(tester.Client.Network.CryptoCode, (string)cryptoCode);
 
 				//Configure JSON custom serialization
-				NBXplorerNetwork networkForDeserializion = new NBXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode((string)cryptoCode);
+				NRXplorerNetwork networkForDeserializion = new NRXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode((string)cryptoCode);
 				JsonSerializerSettings settings = new JsonSerializerSettings();
 				new Serializer(networkForDeserializion).ConfigureSerializer(settings);
 
@@ -1304,7 +1304,7 @@ namespace NBXplorer.Tests
 				tester.UseRabbitMQ = true;
 				tester.Start();
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 
@@ -1365,7 +1365,7 @@ namespace NBXplorer.Tests
 				var message = Encoding.UTF8.GetString(result.Body);
 
 				//Configure JSON custom serialization
-				NBXplorerNetwork networkForDeserializion = new NBXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode((string)cryptoCode);
+				NRXplorerNetwork networkForDeserializion = new NRXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode((string)cryptoCode);
 				JsonSerializerSettings settings = new JsonSerializerSettings();
 				new Serializer(networkForDeserializion).ConfigureSerializer(settings);
 
@@ -1396,7 +1396,7 @@ namespace NBXplorer.Tests
 				tester.UseRabbitMQ = true;
 				tester.Start();
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 
@@ -1446,7 +1446,7 @@ namespace NBXplorer.Tests
 				var message = Encoding.UTF8.GetString(result.Body);
 
 				//Configure JSON custom serialization
-				NBXplorerNetwork networkForDeserializion = new NBXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode((string)cryptoCode);
+				NRXplorerNetwork networkForDeserializion = new NRXplorerNetworkProvider(ChainName.Regtest).GetFromCryptoCode((string)cryptoCode);
 				JsonSerializerSettings settings = new JsonSerializerSettings();
 				new Serializer(networkForDeserializion).ConfigureSerializer(settings);
 
@@ -1493,7 +1493,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 
@@ -1522,7 +1522,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 				var fundingTxId = new uint256(tester.RPC.SendCommand(RPCOperations.sendmany, "",
@@ -1630,7 +1630,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 
@@ -1697,7 +1697,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 				using (var connected = tester.Client.CreateWebsocketNotificationSession())
@@ -1741,7 +1741,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), true);
 				tester.Client.Track(pubkey);
 				var connected = tester.Client.CreateLongPollingNotificationSession();
@@ -1780,7 +1780,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted();
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter(), false);
 
 				var pubkey2 = tester.CreateDerivationStrategy(key.Neuter(), true);
@@ -1827,7 +1827,7 @@ namespace NBXplorer.Tests
 			{
 				await tester.Load("CanMigrateSavedTransactions");
 				tester.Start();
-				var repo = tester.GetService<RepositoryProvider>().GetRepository("BTC");
+				var repo = tester.GetService<RepositoryProvider>().GetRepository("BRLB");
 				var txs = await repo.GetSavedTransactions(new uint256("2c374fa299503ea4740a4a60451bb57cdb73ee5cf216978e3ce5366891f98287"));
 				Assert.Equal(2, txs.Length);
 				Assert.Null(txs[0].BlockHash);
@@ -1840,7 +1840,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var bob = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var bob = new RealbitExtKey(new ExtKey(), tester.Network);
 				var bobPubKey = tester.CreateDerivationStrategy(bob.Neuter());
 				tester.Client.Track(bobPubKey);
 				var id = tester.SendToAddress(tester.AddressOf(bob, "0/1"), Money.Coins(1.0m));
@@ -1862,8 +1862,8 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var bob = new BitcoinExtKey(new ExtKey(), tester.Network);
-				var alice = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var bob = new RealbitExtKey(new ExtKey(), tester.Network);
+				var alice = new RealbitExtKey(new ExtKey(), tester.Network);
 
 				var bobPubKey = tester.CreateDerivationStrategy(bob.Neuter());
 				var alicePubKey = tester.CreateDerivationStrategy(alice.Neuter());
@@ -1873,7 +1873,7 @@ namespace NBXplorer.Tests
 				tester.Client.Track(bobPubKey);
 				var utxoBob = tester.Client.GetUTXOs(bobPubKey);
 
-				Logs.Tester.LogInformation("Let's send 1.0BTC to alice 0/1 and 0.1BTC to bob 0/2 then mine");
+				Logs.Tester.LogInformation("Let's send 1.0BRLB to alice 0/1 and 0.1BRLB to bob 0/2 then mine");
 				var id = tester.SendToAddress(tester.AddressOf(alice, "0/1"), Money.Coins(1.0m));
 				id = tester.SendToAddress(tester.AddressOf(bob, "0/2"), Money.Coins(0.1m));
 				tester.Notifications.WaitForTransaction(bobPubKey, id);
@@ -1883,7 +1883,7 @@ namespace NBXplorer.Tests
 				utxoAlice = tester.Client.GetUTXOs(alicePubKey);
 				utxoBob = tester.Client.GetUTXOs(bobPubKey);
 
-				Logs.Tester.LogInformation("Let's send 0.6BTC from alice 0/1 to bob 0/3");
+				Logs.Tester.LogInformation("Let's send 0.6BRLB from alice 0/1 to bob 0/3");
 				LockTestCoins(tester.RPC);
 				tester.RPC.ImportPrivKey(tester.PrivateKeyOf(alice, "0/1"));
 				id = tester.SendToAddress(tester.AddressOf(bob, "0/3"), Money.Coins(0.6m));
@@ -1892,7 +1892,7 @@ namespace NBXplorer.Tests
 				utxoAlice = tester.Client.GetUTXOs(alicePubKey);
 				utxoBob = tester.Client.GetUTXOs(bobPubKey);
 
-				Logs.Tester.LogInformation("Let's check Alice spent her confirmed UTXO and Bob got his 0.6BTC");
+				Logs.Tester.LogInformation("Let's check Alice spent her confirmed UTXO and Bob got his 0.6BRLB");
 				Assert.Single(utxoAlice.Confirmed.UTXOs);
 				Assert.Single(utxoAlice.Unconfirmed.SpentOutpoints);
 				Assert.Equal(utxoAlice.Unconfirmed.SpentOutpoints[0], utxoAlice.Confirmed.UTXOs[0].Outpoint);
@@ -1906,7 +1906,7 @@ namespace NBXplorer.Tests
 				tester.RPC.EnsureGenerate(1);
 				tester.Notifications.WaitForTransaction(bobPubKey, id);
 
-				Logs.Tester.LogInformation("Let's check bob own 0/6BTC and 0.1 BTC, while Alice own nothing (no change)");
+				Logs.Tester.LogInformation("Let's check bob own 0/6BRLB and 0.1 BRLB, while Alice own nothing (no change)");
 				utxoAlice = tester.Client.GetUTXOs(alicePubKey);
 				utxoBob = tester.Client.GetUTXOs(bobPubKey);
 
@@ -1923,7 +1923,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 				var events = tester.Client.CreateWebsocketNotificationSession();
@@ -1961,7 +1961,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 
@@ -2105,15 +2105,15 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var extkey = new BitcoinExtKey(new ExtKey(), tester.Network);
-				var pubkey = tester.NBXplorerNetwork.DerivationStrategyFactory.Parse($"{extkey.Neuter()}-[legacy]");
+				var extkey = new RealbitExtKey(new ExtKey(), tester.Network);
+				var pubkey = tester.NRXplorerNetwork.DerivationStrategyFactory.Parse($"{extkey.Neuter()}-[legacy]");
 				Logs.Tester.LogInformation("Let's make a tracked address from hd pubkey 0/0");
 				var key = extkey.ExtKey.Derive(new KeyPath("0/0")).PrivateKey;
 				var address = key.PubKey.GetAddress(ScriptPubKeyType.Legacy, tester.Network);
 				var addressSource = TrackedSource.Create(address);
 				tester.Client.Track(addressSource);
 
-				Logs.Tester.LogInformation("Let's send 0.1BTC to tracked address");
+				Logs.Tester.LogInformation("Let's send 0.1BRLB to tracked address");
 				var tx1 = tester.SendToAddress(address, Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(address, tx1);
 				var utxo = tester.Client.GetUTXOs(addressSource);
@@ -2155,8 +2155,8 @@ namespace NBXplorer.Tests
 				Assert.Equal(tx1, tx.ConfirmedTransactions.Transactions[0].TransactionId);
 
 				Logs.Tester.LogInformation("Trying to send to a single address from a tracked extkey");
-				var extkey2 = new BitcoinExtKey(new ExtKey(), tester.Network);
-				var pubkey2 = tester.NBXplorerNetwork.DerivationStrategyFactory.Parse($"{extkey.Neuter()}-[legacy]");
+				var extkey2 = new RealbitExtKey(new ExtKey(), tester.Network);
+				var pubkey2 = tester.NRXplorerNetwork.DerivationStrategyFactory.Parse($"{extkey.Neuter()}-[legacy]");
 				tester.Client.Track(pubkey2);
 				var txId = tester.SendToAddress(pubkey2.GetDerivation(new KeyPath("0/0")).ScriptPubKey, Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(pubkey2, txId);
@@ -2187,10 +2187,10 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
-				Logs.Tester.LogInformation("Let's send 1.0BTC to 0/0");
+				Logs.Tester.LogInformation("Let's send 1.0BRLB to 0/0");
 				var tx00 = tester.SendToAddress(tester.AddressOf(key, "0/0"), Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(pubkey, tx00);
 				var utxo = tester.Client.GetUTXOs(pubkey);
@@ -2198,24 +2198,24 @@ namespace NBXplorer.Tests
 				Assert.Equal(tx00, utxo.Unconfirmed.UTXOs[0].Outpoint.Hash);
 
 
-				Logs.Tester.LogInformation("Let's send 0.6BTC from 0/0 to 1/0");
+				Logs.Tester.LogInformation("Let's send 0.6BRLB from 0/0 to 1/0");
 				LockTestCoins(tester.RPC);
 				tester.RPC.ImportPrivKey(tester.PrivateKeyOf(key, "0/0"));
 				var tx2 = tester.SendToAddress(tester.AddressOf(key, "1/0"), Money.Coins(0.6m));
 				tester.Notifications.WaitForTransaction(pubkey, tx2);
 
-				Logs.Tester.LogInformation("Should have 1 unconf UTXO of 0.6BTC");
+				Logs.Tester.LogInformation("Should have 1 unconf UTXO of 0.6BRLB");
 				utxo = tester.Client.GetUTXOs(pubkey);
 				Assert.Single(utxo.Unconfirmed.UTXOs);
 				Assert.Equal(tx2, utxo.Unconfirmed.UTXOs[0].Outpoint.Hash); //got the 0.6m
 				Assert.Equal(Money.Coins(0.6m), utxo.Unconfirmed.UTXOs[0].Value); //got the 0.6m
 				Assert.Empty(utxo.Unconfirmed.SpentOutpoints);
 
-				Logs.Tester.LogInformation("Let's send 0.15BTC to 0/0");
+				Logs.Tester.LogInformation("Let's send 0.15BRLB to 0/0");
 				var txid = tester.SendToAddress(tester.AddressOf(key, "0/0"), Money.Coins(0.15m));
 				tester.Notifications.WaitForTransaction(pubkey, txid);
 
-				Logs.Tester.LogInformation("0.15BTC and 0.6BTC should be in our UTXO");
+				Logs.Tester.LogInformation("0.15BRLB and 0.6BRLB should be in our UTXO");
 				utxo = tester.Client.GetUTXOs(pubkey);
 				Assert.Equal(2, utxo.Unconfirmed.UTXOs.Count);
 				Assert.IsType<Coin>(utxo.Unconfirmed.UTXOs[0].AsCoin(pubkey));
@@ -2254,8 +2254,8 @@ namespace NBXplorer.Tests
 		{
 			var network = Network.Main;
 			var factory = new DerivationStrategy.DerivationStrategyFactory(network);
-			var tata = new BitcoinExtPubKey("xpub661MyMwAqRbcFiadHioAunPTeic3C17HKPABCBvURz3W2ivn63jzEYYXWpDePLGncjLuRvQKx7jrKweSkoEvgQTvAo5zw4z8HPGC8Y4E4Wr", network);
-			var toto = new BitcoinExtPubKey("xpub661MyMwAqRbcFqyJE6zy5jMF7bjUtvNHgHJPbENEZtEQKRrukKWJP5xLMKntBaNya7CLMLL6u1KEk8GnrEv8pur5DFSgEMf1hRGjsJrcQKS", network);
+			var tata = new RealbitExtPubKey("xpub661MyMwAqRbcFiadHioAunPTeic3C17HKPABCBvURz3W2ivn63jzEYYXWpDePLGncjLuRvQKx7jrKweSkoEvgQTvAo5zw4z8HPGC8Y4E4Wr", network);
+			var toto = new RealbitExtPubKey("xpub661MyMwAqRbcFqyJE6zy5jMF7bjUtvNHgHJPbENEZtEQKRrukKWJP5xLMKntBaNya7CLMLL6u1KEk8GnrEv8pur5DFSgEMf1hRGjsJrcQKS", network);
 
 			var direct = (DirectDerivationStrategy)factory.Parse($"{toto}-[legacy]");
 			Assert.Equal($"{toto}-[legacy]", direct.ToString());
@@ -2326,18 +2326,18 @@ namespace NBXplorer.Tests
 			{
 				tester.Client.WaitServerStarted(Timeout);
 				var status = await tester.Client.GetStatusAsync();
-				Assert.NotNull(status.BitcoinStatus);
+				Assert.NotNull(status.RealbitStatus);
 				Assert.Equal("CanGetStatus", status.InstanceName);
 				Assert.True(status.IsFullySynched);
-				Assert.Equal(status.BitcoinStatus.Blocks, status.BitcoinStatus.Headers);
-				Assert.Equal(status.BitcoinStatus.Blocks, status.ChainHeight);
-				Assert.Equal(1.0, status.BitcoinStatus.VerificationProgress);
+				Assert.Equal(status.RealbitStatus.Blocks, status.RealbitStatus.Headers);
+				Assert.Equal(status.RealbitStatus.Blocks, status.ChainHeight);
+				Assert.Equal(1.0, status.RealbitStatus.VerificationProgress);
 				Assert.NotNull(status.Version);
 				Assert.Equal(tester.CryptoCode, status.CryptoCode);
 				Assert.Equal(ChainName.Regtest, status.NetworkType);
 				Assert.Equal(tester.CryptoCode, status.SupportedCryptoCodes[0]);
 				Assert.Single(status.SupportedCryptoCodes);
-				Assert.NotNull(status.BitcoinStatus.Capabilities);
+				Assert.NotNull(status.RealbitStatus.Capabilities);
 				var resp = await tester.HttpClient.GetAsync("/");
 				Assert.Equal("CanGetStatus", resp.Headers.GetValues("instance-name").First());
 			}
@@ -2351,11 +2351,11 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 
-				Logs.Tester.LogInformation("Let's send 1.0BTC to 0/0");
+				Logs.Tester.LogInformation("Let's send 1.0BRLB to 0/0");
 				var txId = tester.SendToAddress(tester.AddressOf(key, "0/0"), Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(pubkey, txId);
 				Logs.Tester.LogInformation("Check if the tx exists");
@@ -2380,7 +2380,7 @@ namespace NBXplorer.Tests
 				result = tester.Client.GetTransactions(pubkey);
 				Assert.Null(result.UnconfirmedTransactions.Transactions[0].Transaction);
 
-				Logs.Tester.LogInformation("Let's mine and send 1.0BTC to 0");
+				Logs.Tester.LogInformation("Let's mine and send 1.0BRLB to 0");
 				tester.RPC.EnsureGenerate(1);
 				tester.Notifications.WaitForTransaction(pubkey, txId);
 				result = tester.Client.GetTransactions(pubkey);
@@ -2412,18 +2412,18 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 
-				Logs.Tester.LogInformation("Send 1.0BTC to 0/0");
+				Logs.Tester.LogInformation("Send 1.0BRLB to 0/0");
 				var fundingTx = tester.SendToAddress(tester.AddressOf(key, "0/0"), Money.Coins(1.0m));
 				var utxo = tester.Client.GetUTXOs(pubkey);
 				tester.Notifications.WaitForBlocks(tester.RPC.EnsureGenerate(1));
 				utxo = tester.Client.GetUTXOs(pubkey);
 				Assert.Single(utxo.Confirmed.UTXOs);
 
-				Logs.Tester.LogInformation("Send 0.2BTC from the 0/0 to a random address");
+				Logs.Tester.LogInformation("Send 0.2BRLB from the 0/0 to a random address");
 				LockTestCoins(tester.RPC);
 				tester.RPC.ImportPrivKey(tester.PrivateKeyOf(key, "0/0"));
 				var spendingTx = tester.SendToAddress(new Key().PubKey.Hash.GetAddress(tester.Network), Money.Coins(0.2m));
@@ -2453,7 +2453,7 @@ namespace NBXplorer.Tests
 			using (var tester = ServerTester.Create())
 			{
 				tester.Client.WaitServerStarted(Timeout);
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 
 				var txId1 = tester.SendToAddress(tester.AddressOf(key, "0/0"), Money.Coins(1.0m));
@@ -2508,7 +2508,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 
 				tester.Client.Track(pubkey, new TrackWalletRequest()
@@ -2536,14 +2536,14 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 
 				tester.Client.Track(pubkey);
-				Logs.Tester.LogInformation("Sending 1.0 BTC to 0/0");
+				Logs.Tester.LogInformation("Sending 1.0 BRLB to 0/0");
 				var txId = tester.SendToAddress(tester.AddressOf(key, "0/0"), Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(pubkey, txId);
-				Logs.Tester.LogInformation("Making sure the BTC is properly received");
+				Logs.Tester.LogInformation("Making sure the BRLB is properly received");
 				var utxo = tester.Client.GetUTXOs(pubkey);
 				Assert.Equal(tester.Network.Consensus.CoinbaseMaturity + 1, utxo.CurrentHeight);
 				Assert.Single(utxo.Unconfirmed.UTXOs);
@@ -2571,7 +2571,7 @@ namespace NBXplorer.Tests
 				Assert.Equal(1, utxo.Confirmed.UTXOs[0].Confirmations);
 				Assert.Equal(unconfTimestamp, utxo.Confirmed.UTXOs[0].Timestamp);
 
-				Logs.Tester.LogInformation("Let's send 1.0 BTC to 0/1");
+				Logs.Tester.LogInformation("Let's send 1.0 BRLB to 0/1");
 				var confTxId = txId;
 				txId = tester.SendToAddress(tester.AddressOf(key, "0/1"), Money.Coins(1.0m));
 				var txId01 = txId;
@@ -2612,7 +2612,7 @@ namespace NBXplorer.Tests
 
 				var outpoint01 = utxo.Confirmed.UTXOs[0].Outpoint;
 
-				Logs.Tester.LogInformation("Let's send 1.0BTC to 0/2 and mine");
+				Logs.Tester.LogInformation("Let's send 1.0BRLB to 0/2 and mine");
 				txId = tester.SendToAddress(tester.AddressOf(key, "0/2"), Money.Coins(1.0m));
 				tester.Notifications.WaitForTransaction(pubkey, txId);
 				var txId1 = txId;
@@ -2634,7 +2634,7 @@ namespace NBXplorer.Tests
 				Assert.Equal(3, tx.Confirmations);
 				Assert.NotNull(tx.BlockId);
 
-				Logs.Tester.LogInformation("Let's send 0.5 BTC from 0/1 to 0/3");
+				Logs.Tester.LogInformation("Let's send 0.5 BRLB from 0/1 to 0/3");
 				LockTestCoins(tester.RPC);
 				tester.RPC.ImportPrivKey(tester.PrivateKeyOf(key, "0/1"));
 				txId = tester.SendToAddress(tester.AddressOf(key, "0/3"), Money.Coins(0.5m));
@@ -2709,7 +2709,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				Logs.Tester.LogInformation("Let's check an unconf miss result get properly cached: Let's send coins to 0/1 before tracking it");
 				tester.RPC.Generate(1);
@@ -2731,7 +2731,7 @@ namespace NBXplorer.Tests
 			{
 				//WaitServerStarted not needed, just a sanity check
 				tester.Client.WaitServerStarted(Timeout);
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 
@@ -2803,7 +2803,7 @@ namespace NBXplorer.Tests
 		{
 			var arr = Enumerable.Range(0, 100).ToArray();
 			var expected = arr.ToArray();
-			NBitcoin.Utils.Shuffle(arr);
+			NRealbit.Utils.Shuffle(arr);
 			var actual = arr.TopologicalSort(o => arr.Where(a => a < o)).ToArray();
 			Assert.True(expected.SequenceEqual(actual));
 		}
@@ -2811,8 +2811,8 @@ namespace NBXplorer.Tests
 		[Fact]
 		public void CanTopologicalSortRecords()
 		{
-			var key = new BitcoinExtKey(new ExtKey(), Network.RegTest);
-			var pubkey = GetNetwork(Bitcoin.Instance).DerivationStrategyFactory.Parse($"{key.Neuter().ToString()}");
+			var key = new RealbitExtKey(new ExtKey(), Network.RegTest);
+			var pubkey = GetNetwork(Realbit.Instance).DerivationStrategyFactory.Parse($"{key.Neuter().ToString()}");
 			var trackedSource = new DerivationSchemeTrackedSource(pubkey);
 
 			// The topological sorting should always return the most buried transactions first
@@ -2858,7 +2858,7 @@ namespace NBXplorer.Tests
 			var input = annotatedTransaction.ToArray();
 			for (int u = 0; u < 4; u++)
 			{
-				NBitcoin.Utils.Shuffle(input);
+				NRealbit.Utils.Shuffle(input);
 				var result = input.TopologicalSort().ToArray();
 				var dico = new SortedDictionary<AnnotatedTransaction, AnnotatedTransaction>(AnnotatedTransactionComparer.OldToYoung);
 				foreach (var tx in annotatedTransaction)
@@ -2882,7 +2882,7 @@ namespace NBXplorer.Tests
 			var a = new AnnotatedTransaction(height, new TrackedTransaction(new TrackedTransactionKey(RandomUtils.GetUInt256(), null, true), trackedSource, null as Coin[], null), true);
 			if (seen is int v)
 			{
-				a.Record.FirstSeen = NBitcoin.Utils.UnixTimeToDateTime(v);
+				a.Record.FirstSeen = NRealbit.Utils.UnixTimeToDateTime(v);
 			}
 			return a;
 		}
@@ -2904,7 +2904,7 @@ namespace NBXplorer.Tests
 		}
 
 		/// <summary>
-		/// To understand this test, read https://github.com/dgarage/NBXplorer/blob/master/docs/Design.md
+		/// To understand this test, read https://github.com/dgarage/NRXplorer/blob/master/docs/Design.md
 		/// This create a specific graph of transaction and make sure that it computes the UTXO set as expected.
 		/// </summary>
 		[Fact]
@@ -2980,7 +2980,7 @@ namespace NBXplorer.Tests
 
 			for (int iii = 0; iii < 100; iii++)
 			{
-				NBitcoin.Utils.Shuffle(trackedTransactions);
+				NRealbit.Utils.Shuffle(trackedTransactions);
 				var collection = new AnnotatedTransactionCollection(trackedTransactions, builder._TrackedSource, chain, Network.RegTest);
 				Assert.Equal(7, collection.Count);
 
@@ -3032,7 +3032,7 @@ namespace NBXplorer.Tests
 			trackedTransactions = builder.Build();
 			for (int iii = 0; iii < 100; iii++)
 			{
-				NBitcoin.Utils.Shuffle(trackedTransactions);
+				NRealbit.Utils.Shuffle(trackedTransactions);
 				var collection = new AnnotatedTransactionCollection(trackedTransactions, builder._TrackedSource, chain, Network.RegTest);
 				Assert.Empty(collection.ReplacedTransactions);
 				Assert.Empty(collection.UnconfirmedTransactions);
@@ -3059,7 +3059,7 @@ namespace NBXplorer.Tests
 				signed.Inputs[0].PrevOut.N = 999;
 				result = tester.Client.Broadcast(signed);
 				Assert.False(result.Success);
-				var ex = Assert.Throws<NBXplorerException>(() => tester.Client.GetFeeRate(5));
+				var ex = Assert.Throws<NRXplorerException>(() => tester.Client.GetFeeRate(5));
 				Assert.Equal("fee-estimation-unavailable", ex.Error.Code);
 			}
 		}
@@ -3069,7 +3069,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 
@@ -3093,7 +3093,7 @@ namespace NBXplorer.Tests
 				Assert.NotNull(keyInfo?.Address);
 				Assert.Null(tester.Client.GetKeyInformation(pubkey, pubkey.GetDerivation(new KeyPath("0/100")).ScriptPubKey));
 
-				key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				key = new RealbitExtKey(new ExtKey(), tester.Network);
 				pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				Assert.Null(tester.Client.GetKeyInformation(pubkey, pubkey.GetDerivation(new KeyPath("0/0")).ScriptPubKey));
 			}
@@ -3167,7 +3167,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 
@@ -3202,7 +3202,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				var key = new BitcoinExtKey(new ExtKey(), tester.Network);
+				var key = new RealbitExtKey(new ExtKey(), tester.Network);
 				var pubkey = tester.CreateDerivationStrategy(key.Neuter());
 				tester.Client.Track(pubkey);
 				var utxo = tester.Client.GetUTXOs(pubkey); //Track things do not wait
@@ -3268,7 +3268,7 @@ namespace NBXplorer.Tests
 				Logs.Tester.LogInformation($"So finally we should have 2 UTXO, on 0/50 and 0/51");
 				utxo = tester.Client.GetUTXOs(pubkey);
 				Assert.Equal(2, utxo.Confirmed.UTXOs.Count);
-				Assert.NotEqual(NBitcoin.Utils.UnixTimeToDateTime(0), utxo.Confirmed.UTXOs[0].Timestamp);
+				Assert.NotEqual(NRealbit.Utils.UnixTimeToDateTime(0), utxo.Confirmed.UTXOs[0].Timestamp);
 
 				Logs.Tester.LogInformation($"Let's try to spend to ourselves");
 				var changeAddress = tester.Client.GetUnused(pubkey, DerivationFeature.Change);
@@ -3349,8 +3349,8 @@ namespace NBXplorer.Tests
 		[Fact]
 		public void CanUseDerivationAdditionalOptions()
 		{
-			var network = GetNetwork(NBitcoin.Altcoins.AltNetworkSets.Liquid);
-			var x = new ExtKey().Neuter().GetWif(network.NBitcoinNetwork);
+			var network = GetNetwork(NRealbit.Altcoins.AltNetworkSets.Liquid);
+			var x = new ExtKey().Neuter().GetWif(network.NRealbitNetwork);
 			var plainXpub = network.DerivationStrategyFactory.Parse($"{x}");
 			network.DerivationStrategyFactory.Parse($"{x}-[unblinded]");
 			Assert.Throws<FormatException>(() => network.DerivationStrategyFactory.Parse($"{x}-[test]"));
@@ -3391,7 +3391,7 @@ namespace NBXplorer.Tests
 		{
 			using (var tester = ServerTester.Create())
 			{
-				if (tester.Network.NetworkSet != NBitcoin.Altcoins.Liquid.Instance)
+				if (tester.Network.NetworkSet != NRealbit.Altcoins.Liquid.Instance)
 				{
 					return;
 				}
@@ -3408,7 +3408,7 @@ namespace NBXplorer.Tests
 
 				//test: Elements shouldgenerate blinded addresses by default
 				var address =
-					Assert.IsType<BitcoinBlindedAddress>(tester.Client.GetUnused(userDerivationScheme,
+					Assert.IsType<RealbitBlindedAddress>(tester.Client.GetUnused(userDerivationScheme,
 						DerivationFeature.Deposit).Address);
 
 
@@ -3440,7 +3440,7 @@ namespace NBXplorer.Tests
 
 					//test: receive a tx to deriv scheme but to a confidential address with a different blinding key than our derivation method 
 					evtTask = session.NextEventAsync(Timeout);
-					txid = await cashCow.SendToAddressAsync(new BitcoinBlindedAddress(new Key().PubKey, address.UnblindedAddress), Money.Coins(2.0m));
+					txid = await cashCow.SendToAddressAsync(new RealbitBlindedAddress(new Key().PubKey, address.UnblindedAddress), Money.Coins(2.0m));
 					evt = Assert.IsType<NewTransactionEvent>(await evtTask);
 					var unblindabletx = (Assert.IsAssignableFrom<ElementsTransaction>(Assert.IsType<NewTransactionEvent>(evt)
 						.TransactionData.Transaction));
@@ -3458,7 +3458,7 @@ namespace NBXplorer.Tests
 
 					Thread.Sleep(1000);
 					var received = tester.RPC.SendCommand("getreceivedbyaddress", address.ToString(), 0);
-					var receivedMoney = received.Result["bitcoin"].Value<decimal>();
+					var receivedMoney = received.Result["realbit"].Value<decimal>();
 
 					Assert.Equal(0.2m, receivedMoney);
 
@@ -3467,15 +3467,15 @@ namespace NBXplorer.Tests
 
 					Assert.DoesNotContain("-[unblinded]", userDerivationScheme.ToString());
 					//test: setting up unblinded tracking
-					userDerivationScheme = tester.NBXplorerNetwork.DerivationStrategyFactory.Parse(userDerivationScheme.ToString() + "-[unblinded]");
+					userDerivationScheme = tester.NRXplorerNetwork.DerivationStrategyFactory.Parse(userDerivationScheme.ToString() + "-[unblinded]");
 
 					Assert.Contains("-[unblinded]", userDerivationScheme.ToString());
 
-					Assert.True(tester.NBXplorerNetwork.DerivationStrategyFactory.Parse(userDerivationScheme.ToString())
+					Assert.True(tester.NRXplorerNetwork.DerivationStrategyFactory.Parse(userDerivationScheme.ToString())
 									.AdditionalOptions.TryGetValue("unblinded", out var unblinded) && unblinded);
 					await tester.Client.TrackAsync(userDerivationScheme, Timeout);
 					var unusedUnblinded = tester.Client.GetUnused(userDerivationScheme, DerivationFeature.Deposit);
-					Assert.IsNotType<BitcoinBlindedAddress>(unusedUnblinded.Address);
+					Assert.IsNotType<RealbitBlindedAddress>(unusedUnblinded.Address);
 
 					evtTask = session.NextEventAsync(Timeout);
 					txid = await cashCow.SendToAddressAsync(unusedUnblinded.Address, Money.Coins(0.1m));
@@ -3483,7 +3483,7 @@ namespace NBXplorer.Tests
 					tx = (Assert.IsAssignableFrom<ElementsTransaction>(Assert.IsType<NewTransactionEvent>(evt)
 						.TransactionData.Transaction));
 					Assert.Equal(txid, tx.GetHash());
-					Assert.Contains(tx.Outputs, txout => Assert.IsAssignableFrom<ElementsTxOut>(txout).Value?.ToDecimal(MoneyUnit.BTC) == 0.1m);
+					Assert.Contains(tx.Outputs, txout => Assert.IsAssignableFrom<ElementsTxOut>(txout).Value?.ToDecimal(MoneyUnit.BRLB) == 0.1m);
 				}
 			}
 		}
@@ -3572,7 +3572,7 @@ namespace NBXplorer.Tests
 				await tester.Client.GetUnusedAsync(wallet.DerivationScheme, DerivationFeature.Deposit);
 
 				Logs.Tester.LogInformation($"Let's assert it is tracked by RPC {firstKeyInfo.Address}");
-				var waiter = tester.GetService<BitcoinDWaiters>().GetWaiter(tester.Client.Network);
+				var waiter = tester.GetService<RealbitDWaiters>().GetWaiter(tester.Client.Network);
 
 				var txid = await cashCow.SendToAddressAsync(firstKeyInfo.Address, Money.Coins(1.01m));
 				tester.Notifications.WaitForTransaction(wallet.DerivationScheme, txid);
@@ -3584,9 +3584,9 @@ namespace NBXplorer.Tests
 				Assert.False(addressInfo.IsWatchOnly);
 
 				Logs.Tester.LogInformation("Let's test the metadata are correct");
-				Assert.Equal(wallet.MasterHDKey, await tester.Client.GetMetadataAsync<BitcoinExtKey>(wallet.DerivationScheme, WellknownMetadataKeys.MasterHDKey));
+				Assert.Equal(wallet.MasterHDKey, await tester.Client.GetMetadataAsync<RealbitExtKey>(wallet.DerivationScheme, WellknownMetadataKeys.MasterHDKey));
 				Assert.Equal(wallet.AccountKeyPath, await tester.Client.GetMetadataAsync<RootedKeyPath>(wallet.DerivationScheme, WellknownMetadataKeys.AccountKeyPath));
-				Assert.Equal(wallet.AccountHDKey, await tester.Client.GetMetadataAsync<BitcoinExtKey>(wallet.DerivationScheme, WellknownMetadataKeys.AccountHDKey));
+				Assert.Equal(wallet.AccountHDKey, await tester.Client.GetMetadataAsync<RealbitExtKey>(wallet.DerivationScheme, WellknownMetadataKeys.AccountHDKey));
 				Assert.Equal(wallet.Mnemonic.ToString(), await tester.Client.GetMetadataAsync<string>(wallet.DerivationScheme, WellknownMetadataKeys.Mnemonic));
 				Assert.Equal("True", await tester.Client.GetMetadataAsync<string>(wallet.DerivationScheme, WellknownMetadataKeys.ImportAddressToRPC));
 
